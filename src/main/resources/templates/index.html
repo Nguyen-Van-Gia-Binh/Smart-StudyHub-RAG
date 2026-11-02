@@ -5,10 +5,10 @@
         ~{::section}
       )}">
 <body>
-<section class="space-y-6 relative w-full">
+<section class="space-y-8 relative w-full">
 
     <!-- Flash Messages (Alerts) -->
-    <div th:if="${successMessage}" class="alert alert-success shadow-lg rounded-2xl flex items-center justify-between text-white border-none bg-emerald-600/95 backdrop-blur-md relative z-20">
+    <div th:if="${successMessage}" class="alert alert-success shadow-md rounded-2xl flex items-center justify-between text-white border-none bg-emerald-600/95 backdrop-blur-md relative z-20">
         <div class="flex items-center gap-3">
             <i class="fa-solid fa-circle-check text-xl"></i>
             <span class="font-bold text-sm" th:text="${successMessage}">Thao tác thành công!</span>
@@ -16,7 +16,7 @@
         <button onclick="this.parentElement.remove()" class="btn btn-ghost btn-circle btn-xs text-white">✕</button>
     </div>
 
-    <div th:if="${errorMessage}" class="alert alert-error shadow-lg rounded-2xl flex items-center justify-between text-white border-none bg-rose-600/95 backdrop-blur-md relative z-20">
+    <div th:if="${errorMessage}" class="alert alert-error shadow-md rounded-2xl flex items-center justify-between text-white border-none bg-rose-600/95 backdrop-blur-md relative z-20">
         <div class="flex items-center gap-3">
             <i class="fa-solid fa-triangle-exclamation text-xl"></i>
             <span class="font-bold text-sm" th:text="${errorMessage}">Đã xảy ra lỗi!</span>
@@ -24,409 +24,303 @@
         <button onclick="this.parentElement.remove()" class="btn btn-ghost btn-circle btn-xs text-white">✕</button>
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- BỐ CỤC DASHBOARD ĐỨNG (VERTICAL SPLIT DASHBOARD LAYOUT)                    -->
-    <!-- Cột Trái (Sidebar Dọc - 3.5 cols) & Cột Phải (Không Gian Học Tập - 8.5 cols) -->
-    <!-- ========================================================================= -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-
-        <!-- ========================================================= -->
-        <!-- 1. CỘT TRÁI (VERTICAL SIDEBAR / PROFILE & QUOTAS DASHBOARD) -->
-        <!-- ========================================================= -->
-        <aside class="lg:col-span-4 xl:col-span-4 space-y-6">
-
-            <!-- Thẻ 1: Profile Sinh Viên & Thông Tin Gói Cước -->
-            <div class="bg-white/90 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/80 shadow-sm relative overflow-hidden space-y-5">
-                <!-- Decorative subtle glow in corner -->
-                <div class="absolute -top-12 -right-12 w-36 h-36 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 rounded-full blur-2xl pointer-events-none"></div>
-
-                <div class="flex items-center gap-4 relative z-10">
-                    <div class="relative">
-                        <img th:src="${currentUser != null and currentUser.avatar != null ? currentUser.avatar : 'https://api.dicebear.com/7.x/bottts/svg?seed=student'}" 
-                             alt="Avatar" 
-                             class="w-14 h-14 rounded-2xl border-2 border-indigo-500/30 object-cover shadow-sm bg-indigo-50" />
-                        <span class="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-white rounded-full"></span>
-                    </div>
-                    <div class="min-w-0 flex-1">
-                        <div class="flex items-center gap-2">
-                            <h3 class="font-extrabold text-base text-slate-900 truncate" 
-                                th:text="${currentUser != null ? currentUser.fullName : 'Sinh Viên FPT'}">Sinh Viên FPT</h3>
-                        </div>
-                        <p class="text-xs text-slate-500 font-mono" 
-                           th:text="${currentUser != null ? '@' + currentUser.username : '@student'}">@student</p>
-                        
-                        <!-- Badge Hạng Gói Cước -->
-                        <div class="mt-1.5">
-                            <span th:if="${session.currentUser != null and session.currentUser.role == 'ROLE_ADMIN'}" 
-                                  class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-700 text-[10px] font-black border border-purple-200">
-                                <i class="fa-solid fa-shield-halved"></i> ADMIN
-                            </span>
-                            <span th:if="${isProUser and (session.currentUser == null or session.currentUser.role != 'ROLE_ADMIN')}" 
-                                  class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 text-white text-[10px] font-black shadow-sm">
-                                <i class="fa-solid fa-crown text-amber-300"></i> HỘI VIÊN PRO
-                            </span>
-                            <span th:if="${!isProUser and (session.currentUser == null or session.currentUser.role != 'ROLE_ADMIN')}" 
-                                  class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-extrabold border border-slate-200">
-                                <i class="fa-solid fa-user"></i> GÓI MIỄN PHÍ (FREE)
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Nút Hành Động Tạo Môn Chính (To, nổi bật ngay cột đứng) -->
-                <div class="relative z-10 pt-1">
-                    <!-- Dành cho Admin -->
-                    <th:block th:if="${session.currentUser != null and session.currentUser.role == 'ROLE_ADMIN'}">
-                        <button onclick="document.getElementById('modal-create-course').showModal()" 
-                                class="btn w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white border-none rounded-2xl shadow-md shadow-purple-500/25 font-bold gap-2">
-                            <i class="fa-solid fa-plus"></i> Tạo Môn Mẫu Hệ Thống
-                        </button>
-                    </th:block>
-
-                    <!-- Dành cho Sinh Viên -->
-                    <th:block th:unless="${session.currentUser != null and session.currentUser.role == 'ROLE_ADMIN'}">
-                        <button th:if="${canCreateCourse}" 
-                                onclick="document.getElementById('modal-create-course').showModal()" 
-                                class="btn w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white border-none rounded-2xl shadow-md shadow-indigo-500/25 font-bold gap-2">
-                            <i class="fa-solid fa-plus"></i> Tạo Môn Học Mới
-                        </button>
-                        <button th:unless="${canCreateCourse}" 
-                                onclick="document.getElementById('modal-pricing-upgrade').showModal()" 
-                                class="btn w-full bg-amber-500 hover:bg-amber-600 text-white border-none rounded-2xl shadow-md shadow-amber-500/25 font-bold gap-2">
-                            <i class="fa-solid fa-bolt"></i> Nâng Cấp Tạo Thêm Môn
-                        </button>
-                    </th:block>
-                </div>
+    <!-- 1. HERO HEADER BANNER (Hiện Đại, Đẳng Cấp, Tạo Điểm Nhấn) -->
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-8 md:p-10 shadow-xl border border-white/10">
+        <div class="relative z-10 max-w-3xl space-y-3">
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md text-indigo-200 text-xs font-bold border border-white/20">
+                <i class="fa-solid fa-sparkles text-amber-300"></i> HSF302 Assignment • Smart StudyHub Platform
             </div>
-
-            <!-- Thẻ 2: Hạn Ngạch Sử Dụng (Quota & Meters Dọc) -->
-            <div class="bg-white/90 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-5">
-                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                    <h4 class="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                        <i class="fa-solid fa-gauge-high text-indigo-600"></i> Hạn Mức Học Tập
-                    </h4>
-                    <button onclick="document.getElementById('modal-pricing-upgrade').showModal()" 
-                            class="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 transition-colors">
-                        Bảng Giá <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+            <h1 class="text-3xl md:text-4xl font-black tracking-tight leading-tight">
+                Quản Lý Môn Học &amp; <span class="bg-gradient-to-r from-amber-300 via-rose-300 to-indigo-200 bg-clip-text text-transparent">Không Gian Học Tập AI</span>
+            </h1>
+            <p class="text-indigo-100/80 text-xs md:text-sm leading-relaxed max-w-2xl">
+                Tự tạo môn học cá nhân hóa theo kỳ học thực tế, nạp file PDF slide bài giảng để tự động phân tích và kích hoạt trợ lý AI đồng hành ôn thi đạt điểm A+.
+            </p>
+            <div class="pt-2 flex flex-wrap items-center gap-2.5">
+                <!-- Nút dành cho Admin -->
+                <th:block th:if="${session.currentUser != null and session.currentUser.role == 'ROLE_ADMIN'}">
+                    <button onclick="document.getElementById('modal-create-course').showModal()" class="btn btn-sm bg-purple-600 hover:bg-purple-700 border-none text-white rounded-xl font-bold shadow-md shadow-purple-500/25">
+                        <i class="fa-solid fa-plus mr-1"></i> Tạo Môn Mẫu Hệ Thống
                     </button>
-                </div>
+                    <a th:href="@{/admin/dashboard}" class="btn btn-sm btn-outline border-white/30 text-white hover:bg-white/10 rounded-xl font-semibold">
+                        <i class="fa-solid fa-chart-line mr-1"></i> Admin Dashboard
+                    </a>
+                </th:block>
 
-                <!-- Meter 1: Giới Hạn Môn Học -->
-                <div class="space-y-2">
-                    <div class="flex items-center justify-between text-xs">
-                        <span class="text-slate-600 font-semibold flex items-center gap-1.5">
-                            <i class="fa-solid fa-book-bookmark text-indigo-500"></i> Số Môn Đang Học
-                        </span>
-                        <span class="font-extrabold text-slate-900">
-                            <span th:text="${totalCourses}">2</span>
-                            <span th:if="${!isProUser}" class="text-slate-400 font-normal"> / <span th:text="${maxCoursesFree}">3</span> môn</span>
-                            <span th:if="${isProUser}" class="text-emerald-600 font-bold"> / ∞ Không giới hạn</span>
-                        </span>
-                    </div>
-                    <!-- Thanh Progress Bar Môn Học -->
-                    <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
-                        <div th:if="${!isProUser}" 
-                             class="h-full rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 transition-all duration-500" 
-                             th:style="'width: ' + (${totalCourses} * 100 / ${maxCoursesFree}) + '%;'"></div>
-                        <div th:if="${isProUser}" 
-                             class="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 w-full"></div>
-                    </div>
-                    <p th:if="${!isProUser and totalCourses >= maxCoursesFree}" class="text-[11px] text-amber-600 font-medium">
-                        <i class="fa-solid fa-circle-exclamation mr-1"></i>Đã đạt hạn mức 3 môn gói Free. Nâng cấp để mở rộng!
-                    </p>
-                </div>
-
-                <!-- Meter 2: Giới Hạn Hỏi RAG Hôm Nay -->
-                <div class="space-y-2 pt-1">
-                    <div class="flex items-center justify-between text-xs">
-                        <span class="text-slate-600 font-semibold flex items-center gap-1.5">
-                            <i class="fa-solid fa-comments text-purple-500"></i> Lượt Hỏi AI Slide Hôm Nay
-                        </span>
-                        <span class="font-extrabold text-slate-900">
-                            <th:block th:if="${isProUser}">
-                                <span class="text-emerald-600 font-bold flex items-center gap-1">
-                                    <i class="fa-solid fa-infinity text-[11px]"></i> Không giới hạn
-                                </span>
-                            </th:block>
-                            <th:block th:unless="${isProUser}">
-                                <span th:text="${currentUser != null and currentUser.dailyRagCount != null ? currentUser.dailyRagCount : 0}">0</span>
-                                <span class="text-slate-400 font-normal"> / 50 câu</span>
-                            </th:block>
-                        </span>
-                    </div>
-                    <!-- Thanh Progress Bar RAG -->
-                    <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
-                        <div th:if="${!isProUser}" 
-                             class="h-full rounded-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-500"
-                             th:style="'width: ' + (${currentUser != null and currentUser.dailyRagCount != null ? currentUser.dailyRagCount : 0} * 100 / 50) + '%;'"></div>
-                        <div th:if="${isProUser}" 
-                             class="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 w-full"></div>
-                    </div>
-                    <p class="text-[11px] text-slate-400">Trích dẫn chính xác số trang slide đối chứng 0% ảo giác.</p>
-                </div>
-
-                <!-- Nút Nâng Cấp Pro Nổi Bật Dành Cho Free User -->
-                <div th:if="${!isProUser and (session.currentUser == null or session.currentUser.role != 'ROLE_ADMIN')}" class="pt-2">
-                    <button onclick="document.getElementById('modal-pricing-upgrade').showModal()" 
-                            class="btn btn-sm w-full bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-600 hover:opacity-95 text-white border-none rounded-xl text-xs font-bold shadow-md shadow-purple-500/20">
-                        <i class="fa-solid fa-bolt text-amber-300"></i> Nâng Cấp Gói PRO ($2/tháng)
+                <!-- Nút dành cho Sinh Viên -->
+                <th:block th:unless="${session.currentUser != null and session.currentUser.role == 'ROLE_ADMIN'}">
+                    <button th:if="${canCreateCourse}" onclick="document.getElementById('modal-create-course').showModal()" class="btn btn-sm bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 border-none text-white rounded-xl font-bold shadow-md shadow-indigo-500/30">
+                        <i class="fa-solid fa-plus mr-1"></i> Tạo Môn Học Mới
                     </button>
-                </div>
-            </div>
-
-            <!-- Thẻ 3: Bộ Lọc Theo Học Kỳ (Vertical Semester Filter) -->
-            <div class="bg-white/90 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-3">
-                <h4 class="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                    <i class="fa-solid fa-calendar-days text-indigo-600"></i> Học Kỳ
-                </h4>
-                <div class="space-y-1">
-                    <!-- Tất cả học kỳ -->
-                    <a th:href="@{/courses(keyword=${currentKeyword})}" 
-                       class="flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold text-xs transition-all"
-                       th:classappend="${currentSemester == null or currentSemester == 'ALL'} ? 'bg-indigo-50 text-indigo-700 shadow-sm' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'">
-                        <span class="flex items-center gap-2">
-                            <i class="fa-solid fa-layer-group text-xs" th:classappend="${currentSemester == null or currentSemester == 'ALL'} ? 'text-indigo-600' : 'text-slate-400'"></i>
-                            Tất Cả Học Kỳ
-                        </span>
-                        <span class="badge badge-sm border-none text-[10px]"
-                              th:classappend="${currentSemester == null or currentSemester == 'ALL'} ? 'bg-indigo-200/60 text-indigo-800' : 'bg-slate-100 text-slate-500'"
-                              th:text="${totalCourses}">5</span>
-                    </a>
-
-                    <!-- Danh sách học kỳ động -->
-                    <a th:each="sem : ${semesters}" 
-                       th:href="@{/courses(semester=${sem}, keyword=${currentKeyword})}" 
-                       class="flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold text-xs transition-all"
-                       th:classappend="${currentSemester == sem} ? 'bg-indigo-50 text-indigo-700 shadow-sm' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'">
-                        <span class="flex items-center gap-2">
-                            <i class="fa-solid fa-graduation-cap text-xs" th:classappend="${currentSemester == sem} ? 'text-indigo-600' : 'text-slate-400'"></i>
-                            <span th:text="${sem}">Fall 2026</span>
-                        </span>
-                        <i class="fa-solid fa-chevron-right text-[10px]" th:classappend="${currentSemester == sem} ? 'text-indigo-600' : 'text-slate-300'"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Thẻ 4: Tiện Ích Học Tập Nhanh (Quick Shortcuts) -->
-            <div class="bg-white/90 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-3">
-                <h4 class="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                    <i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i> Tiện Ích Học Tập AI
-                </h4>
-                <div class="space-y-2">
-                    <a th:href="@{/planner}" class="flex items-center gap-3 p-3 rounded-2xl bg-emerald-50/70 hover:bg-emerald-100/70 text-emerald-900 border border-emerald-100 transition-all group">
-                        <div class="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-sm shadow-sm">
-                            <i class="fa-solid fa-calendar-check"></i>
-                        </div>
-                        <div class="min-w-0 flex-1">
-                            <div class="font-bold text-xs">Lịch Học Vừa Sức</div>
-                            <div class="text-[10px] text-emerald-700 font-medium">Tối ưu theo thời gian rảnh</div>
-                        </div>
-                        <i class="fa-solid fa-arrow-right text-xs text-emerald-500 group-hover:translate-x-1 transition-transform"></i>
-                    </a>
-
-                    <a th:href="@{/quiz}" class="flex items-center gap-3 p-3 rounded-2xl bg-amber-50/70 hover:bg-amber-100/70 text-amber-900 border border-amber-100 transition-all group">
-                        <div class="w-9 h-9 rounded-xl bg-amber-600 text-white flex items-center justify-center text-sm shadow-sm">
-                            <i class="fa-solid fa-list-check"></i>
-                        </div>
-                        <div class="min-w-0 flex-1">
-                            <div class="font-bold text-xs">Luyện Đề Trắc Nghiệm</div>
-                            <div class="text-[10px] text-amber-700 font-medium">Đề thi A/B/C/D bám sát slide</div>
-                        </div>
-                        <i class="fa-solid fa-arrow-right text-xs text-amber-500 group-hover:translate-x-1 transition-transform"></i>
-                    </a>
-
-                    <!-- Admin Link nếu là ADMIN -->
-                    <a th:if="${session.currentUser != null and session.currentUser.role == 'ROLE_ADMIN'}" 
-                       th:href="@{/admin/dashboard}" 
-                       class="flex items-center gap-3 p-3 rounded-2xl bg-purple-50/70 hover:bg-purple-100/70 text-purple-900 border border-purple-100 transition-all group">
-                        <div class="w-9 h-9 rounded-xl bg-purple-600 text-white flex items-center justify-center text-sm shadow-sm">
-                            <i class="fa-solid fa-chart-line"></i>
-                        </div>
-                        <div class="min-w-0 flex-1">
-                            <div class="font-bold text-xs">Admin Command Center</div>
-                            <div class="text-[10px] text-purple-700 font-medium">Giám sát hệ thống &amp; Quota</div>
-                        </div>
-                        <i class="fa-solid fa-arrow-right text-xs text-purple-500 group-hover:translate-x-1 transition-transform"></i>
-                    </a>
-                </div>
-            </div>
-
-        </aside>
-
-        <!-- ========================================================== -->
-        <!-- 2. CỘT PHẢI (MAIN COURSE WORKSPACE - KHÔNG GIAN MÔN HỌC)    -->
-        <!-- ========================================================== -->
-        <main class="lg:col-span-8 xl:col-span-8 space-y-6">
-
-            <!-- Header Thanh Tìm Kiếm & Lọc Môn Học -->
-            <div class="bg-white/90 backdrop-blur-xl rounded-3xl p-5 border border-slate-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h2 class="text-xl font-extrabold text-slate-900 flex items-center gap-2">
-                        <i class="fa-solid fa-shapes text-indigo-600"></i> Không Gian Môn Học
-                    </h2>
-                    <p class="text-xs text-slate-500 mt-0.5">
-                        Chọn một môn để truy cập không gian chat AI, tài liệu giáo trình và luyện đề
-                    </p>
-                </div>
-
-                <!-- Form Tìm Kiếm Tinh Gọn -->
-                <form th:action="@{/courses}" method="get" class="flex items-center gap-2">
-                    <input type="hidden" name="semester" th:value="${currentSemester != null ? currentSemester : 'ALL'}" />
-                    
-                    <div class="relative">
-                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                        <input type="text" name="keyword" th:value="${currentKeyword}" placeholder="Tìm mã môn, tên môn..." 
-                               class="input input-sm bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 pl-9 w-48 sm:w-64 rounded-xl text-xs focus:border-indigo-500 focus:bg-white transition-all" />
-                    </div>
-
-                    <button type="submit" class="btn btn-sm bg-indigo-600 hover:bg-indigo-700 border-none text-white rounded-xl font-bold shadow-sm shadow-indigo-500/20 text-xs" title="Tìm kiếm">
-                        <i class="fa-solid fa-magnifying-glass"></i>
+                    <button th:unless="${canCreateCourse}" onclick="document.getElementById('modal-pricing-upgrade').showModal()" class="btn btn-sm btn-warning text-white rounded-xl font-bold shadow-md">
+                        <i class="fa-solid fa-bolt mr-1"></i> Nâng Cấp Tạo Thêm Môn
                     </button>
-
-                    <a th:if="${(currentKeyword != null and !currentKeyword.isEmpty()) or (currentSemester != null and currentSemester != 'ALL')}" 
-                       th:href="@{/courses}" 
-                       class="btn btn-sm btn-ghost text-slate-500 hover:text-slate-800 rounded-xl text-xs" title="Đặt lại bộ lọc">
-                        <i class="fa-solid fa-rotate-left"></i>
-                    </a>
-                </form>
-            </div>
-
-            <!-- TRẠNG THÁI TRỐNG (EMPTY STATE KHI TÌM KHÔNG THẤY HOẶC CHƯA CÓ MÔN) -->
-            <div th:if="${courses.empty}" class="bg-white/90 backdrop-blur-xl rounded-3xl p-12 text-center space-y-4 border border-slate-200/80 shadow-sm">
-                <div class="w-16 h-16 rounded-2xl bg-indigo-50 text-indigo-600 mx-auto flex items-center justify-center text-3xl">
-                    <i class="fa-solid fa-folder-open"></i>
-                </div>
-                <h3 class="text-lg font-bold text-slate-900">Không tìm thấy môn học nào phù hợp</h3>
-                <p class="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
-                    Không tìm thấy môn học nào khớp với điều kiện tìm kiếm hoặc bạn chưa tạo môn học nào.
-                </p>
-                <div class="flex items-center justify-center gap-3 pt-2">
-                    <a th:if="${(currentKeyword != null and !currentKeyword.isEmpty()) or (currentSemester != null and currentSemester != 'ALL')}" 
-                       th:href="@{/courses}" 
-                       class="btn btn-sm btn-outline border-slate-300 text-slate-700 hover:bg-slate-100 rounded-xl font-bold text-xs">
-                        <i class="fa-solid fa-rotate-left mr-1"></i> Xem Tất Cả Môn
-                    </a>
-                    <button th:if="${canCreateCourse}" 
-                            onclick="document.getElementById('modal-create-course').showModal()" 
-                            class="btn btn-sm bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white border-none rounded-xl font-bold shadow-md shadow-indigo-500/20 text-xs">
-                        <i class="fa-solid fa-plus mr-1"></i> Tạo Môn Học Đầu Tiên
+                    <button onclick="document.getElementById('modal-pricing-upgrade').showModal()" class="btn btn-sm btn-outline border-white/30 text-white hover:bg-white/10 rounded-xl font-semibold">
+                        <i class="fa-solid fa-gem mr-1 text-amber-300"></i> Bảng Giá Gói Cước
                     </button>
-                    <button th:unless="${canCreateCourse}" 
-                            onclick="document.getElementById('modal-pricing-upgrade').showModal()" 
-                            class="btn btn-sm btn-warning text-white rounded-xl font-bold text-xs">
-                        <i class="fa-solid fa-bolt mr-1"></i> Nâng Cấp Để Tạo Môn
-                    </button>
-                </div>
+                    <a th:href="@{/planner}" class="btn btn-sm btn-ghost text-white/90 hover:bg-white/10 rounded-xl font-semibold">
+                        <i class="fa-solid fa-calendar-check mr-1 text-emerald-400"></i> Lịch Học Vừa Sức
+                    </a>
+                    <a th:href="@{/quiz}" class="btn btn-sm btn-ghost text-white/90 hover:bg-white/10 rounded-xl font-semibold">
+                        <i class="fa-solid fa-list-check mr-1 text-amber-400"></i> Luyện Đề Trắc Nghiệm
+                    </a>
+                </th:block>
             </div>
-
-            <!-- DANH SÁCH MÔN HỌC (THIẾT KẾ ĐẸP, MÀU SẮC HÀI HÒA, PHÂN CẤP TỪ NGOÀI VÀO TRONG) -->
-            <div th:unless="${courses.empty}" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div th:each="course : ${courses}" 
-                     class="bg-white/95 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/80 shadow-sm hover:shadow-xl hover:border-indigo-400/80 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden">
-                    
-                    <!-- Dải màu gradient định danh trên đầu card -->
-                    <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r"
-                         th:classappend="${course.color} ?: 'from-indigo-600 to-purple-600'"></div>
-
-                    <div class="space-y-4">
-                        <!-- Dòng chỉ định tác giả nếu Admin xem môn của sinh viên khác (BẮT BUỘC ĐỂ TEST ADMIN HUB PASS) -->
-                        <p th:if="${currentUser != null and currentUser.admin}" class="text-xs text-indigo-600 font-semibold" th:text="${course.ownerUsername != null} ? |Bởi: ${course.ownerUsername}| : 'Môn mẫu hệ thống'"></p>
-
-                        <!-- Header Card: Icon, Mã Môn & Menu 3 Chấm -->
-                        <div class="flex items-start justify-between">
-                            <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr text-white flex items-center justify-center font-bold text-lg shadow-md shadow-indigo-500/20 transition-transform group-hover:scale-105"
-                                     th:classappend="${course.color} ?: 'from-indigo-600 to-purple-600'">
-                                    <i class="fa-solid" th:classappend="${course.icon} ?: 'fa-book-open'"></i>
-                                </div>
-                                <div>
-                                    <span class="px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-800 border border-slate-200 text-xs font-black tracking-wide" th:text="${course.code}">HSF302</span>
-                                    <span class="text-[11px] block text-slate-500 font-semibold mt-1" th:text="${course.semester} + ' • ' + ${course.credits} + ' tín chỉ'">Fall 2026 • 3 tín chỉ</span>
-                                </div>
-                            </div>
-
-                            <!-- Dropdown Menu 3 chấm (Gom gọn thao tác quản trị phụ, không làm rối mắt) -->
-                            <div class="dropdown dropdown-end">
-                                <button tabindex="0" class="btn btn-ghost btn-circle btn-xs text-slate-400 hover:text-slate-700" title="Tùy chọn môn học">
-                                    <i class="fa-solid fa-ellipsis-vertical text-sm"></i>
-                                </button>
-                                <ul tabindex="0" class="dropdown-content z-20 menu p-2 shadow-xl rounded-2xl w-44 text-xs font-semibold bg-white border border-slate-100 text-slate-700">
-                                    <li>
-                                        <a th:href="@{'/courses/' + ${course.id}}" class="hover:bg-indigo-50 hover:text-indigo-600">
-                                            <i class="fa-solid fa-door-open text-indigo-500"></i> Vào Lớp Học
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <button type="button" class="hover:bg-amber-50 hover:text-amber-600" 
-                                                th:attr="onclick='openEditModal(' + ${course.id} + ', \'' + ${#strings.escapeJavaScript(course.code)} + '\', \'' + ${#strings.escapeJavaScript(course.name)} + '\', \'' + ${#strings.escapeJavaScript(course.description ?: '')} + '\', \'' + ${#strings.escapeJavaScript(course.semester ?: 'Fall 2026')} + '\', ' + ${course.credits ?: 3} + ', \'' + ${#strings.escapeJavaScript(course.color ?: '')} + '\', \'' + ${#strings.escapeJavaScript(course.icon ?: '')} + '\')'">
-                                            <i class="fa-solid fa-pen-to-square text-amber-500"></i> Chỉnh Sửa
-                                        </button>
-                                    </li>
-                                    <li class="border-t border-slate-100 mt-1 pt-1">
-                                        <a th:href="@{'/courses/delete/' + ${course.id}}"
-                                           onclick="return confirm('Bạn có chắc chắn muốn xóa môn học này không? Toàn bộ tài liệu PDF và dữ liệu liên quan sẽ bị xóa vĩnh viễn!')"
-                                           class="text-rose-600 hover:bg-rose-50">
-                                           <i class="fa-solid fa-trash-can"></i> Xóa Môn Học
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <!-- Tên Môn Học & Mô Tả Súc Tích -->
-                        <div>
-                            <a th:href="@{'/courses/' + ${course.id}}" class="block group-hover:text-indigo-600 transition-colors">
-                                <h3 class="text-base font-bold text-slate-900 leading-snug line-clamp-1" th:text="${course.name}">
-                                    JPA and Spring Framework
-                                </h3>
-                            </a>
-                            <p class="text-xs text-slate-500 mt-1.5 line-clamp-2 leading-relaxed" th:text="${course.description}">
-                                Mô tả chi tiết nội dung chương trình học của môn...
-                            </p>
-                        </div>
-
-                        <!-- Badges Trạng Thái Phân Cấp & Quyền Sở Hữu (BẮT BUỘC ĐỂ TEST AdminHubTest PASS) -->
-                        <div class="flex items-center gap-2 pt-1 flex-wrap">
-                            <!-- Trạng thái chuẩn bị Slide AI -->
-                            <span th:if="${course.chunkCount > 0}" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200/60 text-emerald-700 text-[11px] font-semibold">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Sẵn sàng hỏi đáp AI
-                            </span>
-                            <span th:unless="${course.chunkCount > 0}" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-500 text-[11px] font-medium">
-                                <i class="fa-solid fa-cloud-arrow-up text-[10px]"></i> Cần nạp slide
-                            </span>
-
-                            <!-- Nhãn Sở Hữu Môn (Bảo toàn token cho MockMvc assertion) -->
-                            <span th:if="${course.isSystemSample()}" class="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 font-semibold text-[10px]">
-                                Môn mẫu
-                            </span>
-                            <span th:unless="${course.isSystemSample()}" class="px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 font-semibold text-[10px]">
-                                <span th:text="${currentUser != null and course.isOwnedBy(currentUser.id)} ? 'Môn của bạn' : 'Môn sinh viên'">Môn của bạn</span>
-                            </span>
-
-                            <!-- Ngày tạo -->
-                            <span class="text-slate-400 text-[11px] ml-auto">
-                                <i class="fa-regular fa-calendar mr-1"></i><span th:text="${#temporals.format(course.createdAt, 'dd/MM/yyyy')}">18/10/2026</span>
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- Footer Action: DUY NHẤT 1 NÚT CTA CHÍNH (Tiến vào Level 2 Course Detail Hub) -->
-                    <div class="pt-5 mt-5 border-t border-slate-100">
-                        <a th:href="@{'/courses/' + ${course.id}}" 
-                           class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold text-xs tracking-wide shadow-sm shadow-indigo-500/20 group-hover:shadow-md group-hover:shadow-indigo-500/30 transition-all">
-                            <span>Vào Lớp Học</span>
-                            <i class="fa-solid fa-arrow-right text-[11px] group-hover:translate-x-1.5 transition-transform duration-200"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-        </main>
+        </div>
+        <div class="absolute -right-12 -bottom-12 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- MODAL 1: TẠO MÔN HỌC MỚI (MODERN SAAS LIGHT THEME)                        -->
-    <!-- ========================================================================= -->
+    <!-- 2. QUICK STATS BAR (TOÀN BỘ CARD MÀU TRẮNG TINH TẾ, HIỆN ĐẠI) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Thẻ 1: Môn Học & Hạn Ngạch (White Card) -->
+        <div class="rounded-2xl p-5 bg-white/95 backdrop-blur-xl border border-slate-200/80 text-slate-800 shadow-sm hover:shadow-md hover:border-indigo-300 transition-all flex items-center justify-between">
+            <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg font-bold">
+                    <i class="fa-solid fa-book-bookmark"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Môn Học &amp; Hạn Ngạch</p>
+                        <span th:if="${isProUser}" class="badge badge-primary badge-xs font-black text-[9px]">PRO</span>
+                        <span th:unless="${isProUser}" class="badge badge-ghost badge-xs font-black text-[9px] bg-slate-100 text-slate-600 border-slate-200">FREE</span>
+                    </div>
+                    <div class="flex items-baseline gap-1.5 mt-0.5">
+                        <h4 class="text-2xl font-black text-slate-900" th:text="${totalCourses}">2</h4>
+                        <span th:if="${!isProUser}" class="text-xs font-bold text-slate-400">/ <span th:text="${maxCoursesFree}">3</span> môn</span>
+                        <span th:if="${isProUser}" class="text-xs font-bold text-emerald-600">/ ∞ không giới hạn</span>
+                    </div>
+                </div>
+            </div>
+            <button th:if="${session.currentUser == null or (session.currentUser.role != 'ROLE_ADMIN' and !isProUser)}" 
+                    onclick="document.getElementById('modal-pricing-upgrade').showModal()"
+                    class="btn btn-xs rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-[11px] font-bold gap-1 transition-all"
+                    title="Nâng cấp gói">
+                <i class="fa-solid fa-bolt text-amber-500"></i> Nâng cấp
+            </button>
+        </div>
+
+        <!-- Thẻ 2: Hạn Ngạch RAG Hôm Nay (White Card) -->
+        <div class="rounded-2xl p-5 bg-white/95 backdrop-blur-xl border border-slate-200/80 text-slate-800 shadow-sm hover:shadow-md hover:border-purple-300 transition-all flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-lg font-bold">
+                <i class="fa-solid fa-comments"></i>
+            </div>
+            <div>
+                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Hỏi Đáp RAG Hôm Nay</p>
+                <div class="flex items-baseline gap-1.5 mt-0.5">
+                    <h4 th:if="${isProUser}" class="text-lg font-black text-emerald-600 flex items-center gap-1">
+                        <i class="fa-solid fa-infinity text-xs"></i> Không giới hạn
+                    </h4>
+                    <h4 th:unless="${isProUser}" class="text-2xl font-black text-slate-900">
+                        <span th:text="${currentUser != null and currentUser.dailyRagCount != null ? currentUser.dailyRagCount : 0}">0</span>
+                        <span class="text-xs font-bold text-slate-400">/ 50 câu</span>
+                    </h4>
+                </div>
+                <p class="text-[11px] text-slate-500">Trích dẫn đối chứng 0% ảo giác</p>
+            </div>
+        </div>
+
+        <!-- Thẻ 3: Gói Hội Viên (White Card) -->
+        <div class="rounded-2xl p-5 bg-white/95 backdrop-blur-xl border border-slate-200/80 text-slate-800 shadow-sm hover:shadow-md hover:border-amber-300 transition-all flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg font-bold">
+                <i class="fa-solid fa-crown"></i>
+            </div>
+            <div>
+                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Gói Cước Đang Dùng</p>
+                <div class="mt-0.5">
+                    <span th:if="${session.currentUser != null and session.currentUser.role == 'ROLE_ADMIN'}" class="text-sm font-black text-purple-700">Quản Trị Viên (ADMIN)</span>
+                    <span th:if="${session.currentUser != null and session.currentUser.subscriptionTier == 'SQUAD'}" class="text-sm font-black text-cyan-700">Gói Nhóm (SQUAD)</span>
+                    <span th:if="${session.currentUser != null and session.currentUser.subscriptionTier == 'PRO' and session.currentUser.role != 'ROLE_ADMIN'}" class="text-sm font-black text-pink-600">Gói Chuyên Sâu (PRO)</span>
+                    <span th:if="${session.currentUser == null or (session.currentUser.subscriptionTier == 'FREE' and session.currentUser.role != 'ROLE_ADMIN')}" class="text-sm font-black text-slate-800">Sinh Viên Tự Học (FREE)</span>
+                </div>
+                <p class="text-[11px] text-slate-500">Mở khóa RAG &amp; Đề thi AI</p>
+            </div>
+        </div>
+
+        <!-- Thẻ 4: Học Kỳ Trọng Tâm (White Card) -->
+        <div class="rounded-2xl p-5 bg-white/95 backdrop-blur-xl border border-slate-200/80 text-slate-800 shadow-sm hover:shadow-md hover:border-emerald-300 transition-all flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg font-bold">
+                <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+            <div>
+                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Học Kỳ Trọng Tâm</p>
+                <h4 class="text-xl font-black text-slate-900 mt-0.5">Fall 2026</h4>
+                <p class="text-[11px] text-emerald-700 font-semibold">Tự nạp slide bài giảng (BYOC)</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. KHU VỰC QUẢN LÝ MÔN HỌC (COURSES SECTION) -->
+    <div class="space-y-6">
+        <!-- Header Thanh Điều Khiển: Tiêu Đề, Search & Bộ Lọc (White Card) -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-2xl bg-white/95 backdrop-blur-md border border-slate-200/80 shadow-sm">
+            <div>
+                <h2 class="text-xl font-extrabold text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-shapes text-indigo-600"></i> Danh Sách Môn Học
+                </h2>
+                <p class="text-xs text-slate-500 mt-0.5">Chọn một môn học để vào lớp, hỏi đáp AI bám sát giáo trình hoặc luyện đề thi</p>
+            </div>
+
+            <!-- Form Tìm Kiếm & Lọc Học Kỳ -->
+            <form th:action="@{/courses}" method="get" class="flex flex-wrap items-center gap-2">
+                <!-- Dropdown Lọc Học Kỳ -->
+                <select name="semester" class="select select-sm bg-slate-50 border-slate-200 text-slate-800 rounded-xl text-xs font-semibold focus:border-indigo-500">
+                    <option value="ALL" th:selected="${currentSemester == null or currentSemester == 'ALL'}">Tất Cả Học Kỳ</option>
+                    <option th:each="sem : ${semesters}" th:value="${sem}" th:text="${sem}" th:selected="${currentSemester == sem}">Fall 2026</option>
+                </select>
+
+                <!-- Ô Nhập Tìm Kiếm -->
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <input type="text" name="keyword" th:value="${currentKeyword}" placeholder="Tìm mã môn, tên môn..." 
+                           class="input input-sm bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 pl-8 w-44 md:w-56 rounded-xl text-xs focus:border-indigo-500 focus:bg-white" />
+                </div>
+
+                <!-- Nút Hành Động -->
+                <button type="submit" class="btn btn-sm bg-indigo-600 hover:bg-indigo-700 border-none text-white rounded-xl font-bold shadow-sm shadow-indigo-500/20 text-xs" title="Tìm kiếm môn học">
+                    <i class="fa-solid fa-magnifying-glass mr-1"></i> Tìm Kiếm
+                </button>
+                <a th:if="${(currentKeyword != null and !currentKeyword.isEmpty()) or (currentSemester != null and currentSemester != 'ALL')}" 
+                   th:href="@{/courses}" 
+                   class="btn btn-sm btn-ghost text-slate-500 hover:text-slate-800 rounded-xl text-xs" title="Đặt lại bộ lọc">
+                    <i class="fa-solid fa-rotate-left mr-1"></i> Đặt Lại
+                </a>
+
+                <!-- Nút Thêm Môn -->
+                <button th:if="${canCreateCourse}" type="button" onclick="document.getElementById('modal-create-course').showModal()" 
+                        class="btn btn-sm bg-gradient-to-r from-indigo-500 to-purple-600 border-none text-white rounded-xl ml-2 font-bold shadow-sm shadow-purple-500/20 text-xs">
+                    <i class="fa-solid fa-plus mr-1"></i> Thêm Môn
+                </button>
+                <button th:unless="${canCreateCourse}" type="button" onclick="document.getElementById('modal-pricing-upgrade').showModal()" 
+                        class="btn btn-sm btn-warning rounded-xl ml-2 text-white shadow-sm gap-1 font-bold text-xs" 
+                        title="Đã đạt giới hạn 3 môn của gói Free. Nhấn để nâng cấp!">
+                    <i class="fa-solid fa-lock"></i> Thêm Môn <span class="badge badge-xs badge-neutral text-[9px]">PRO</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- TRẠNG THÁI TRỐNG (EMPTY STATE KHI TÌM KHÔNG THẤY) -->
+        <div th:if="${courses.empty}" class="rounded-3xl p-12 text-center space-y-4 bg-white/95 backdrop-blur-xl border border-slate-200/80 text-slate-800 shadow-sm">
+            <div class="w-16 h-16 rounded-2xl bg-indigo-50 text-indigo-600 mx-auto flex items-center justify-center text-3xl">
+                <i class="fa-solid fa-folder-open"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900">Không tìm thấy môn học nào phù hợp</h3>
+            <p class="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+                Không tìm thấy môn học nào khớp với từ khóa hoặc bạn chưa tạo môn học nào. Hãy kiểm tra lại từ khóa hoặc bấm nút dưới đây để tạo môn mới!
+            </p>
+            <div class="flex items-center justify-center gap-3 pt-2">
+                <a th:if="${currentKeyword != null and !currentKeyword.isEmpty()}" th:href="@{/courses}" class="btn btn-sm btn-outline border-slate-300 text-slate-700 hover:bg-slate-100 rounded-xl font-semibold text-xs">
+                    <i class="fa-solid fa-rotate-left mr-1"></i> Xem Tất Cả Môn
+                </a>
+                <button th:if="${canCreateCourse}" onclick="document.getElementById('modal-create-course').showModal()" class="btn btn-sm bg-gradient-to-r from-indigo-600 to-purple-600 border-none text-white rounded-xl font-bold shadow-md shadow-indigo-500/20 text-xs">
+                    <i class="fa-solid fa-plus mr-1"></i> Tạo Môn Học Mới
+                </button>
+                <button th:unless="${canCreateCourse}" onclick="document.getElementById('modal-pricing-upgrade').showModal()" class="btn btn-sm btn-warning rounded-xl text-white font-bold text-xs">
+                    <i class="fa-solid fa-bolt mr-1"></i> Nâng Cấp Để Tạo Thêm Môn
+                </button>
+            </div>
+        </div>
+
+        <!-- LƯỚI CARD MÔN HỌC (3 CỘT, MỖI CARD MÀU TRẮNG HIỆN ĐẠI, TINH TẾ) -->
+        <div th:unless="${courses.empty}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div th:each="course : ${courses}" 
+                 class="rounded-3xl p-6 bg-white/95 backdrop-blur-xl border border-slate-200/80 text-slate-800 shadow-sm hover:shadow-xl hover:border-indigo-400/80 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden">
+                
+                <!-- Thanh viền màu gradient trên cùng nhận diện theo môn -->
+                <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r"
+                     th:classappend="${course.color} ?: 'from-indigo-600 to-purple-600'"></div>
+
+                <div class="space-y-4">
+                    <!-- Dòng tác giả nếu là Admin xem môn của sinh viên khác (BẮT BUỘC ĐỂ TEST AdminHubTest PASS) -->
+                    <p th:if="${currentUser != null and currentUser.admin}" class="text-xs text-indigo-600 font-semibold" th:text="${course.ownerUsername != null} ? |Bởi: ${course.ownerUsername}| : 'Môn mẫu hệ thống'"></p>
+
+                    <!-- Header Card: Icon, Mã Môn & Menu 3 Chấm -->
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr text-white flex items-center justify-center font-bold text-lg shadow-md shadow-indigo-500/20 transition-transform group-hover:scale-105"
+                                 th:classappend="${course.color} ?: 'from-indigo-600 to-purple-600'">
+                                <i class="fa-solid" th:classappend="${course.icon} ?: 'fa-book-open'"></i>
+                            </div>
+                            <div>
+                                <span class="px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-800 border border-slate-200 text-xs font-black tracking-wide" th:text="${course.code}">HSF302</span>
+                                <span class="text-[11px] block text-slate-500 font-semibold mt-1" th:text="${course.semester} + ' • ' + ${course.credits} + ' tín chỉ'">Fall 2026 • 3 tín chỉ</span>
+                            </div>
+                        </div>
+
+                        <!-- Dropdown Menu 3 chấm (Gom gọn thao tác quản trị phụ) -->
+                        <div class="dropdown dropdown-end">
+                            <button tabindex="0" class="btn btn-ghost btn-circle btn-xs text-slate-400 hover:text-slate-700" title="Thao tác môn học">
+                                <i class="fa-solid fa-ellipsis-vertical text-sm"></i>
+                            </button>
+                            <ul tabindex="0" class="dropdown-content z-20 menu p-2 shadow-xl rounded-2xl w-44 text-xs font-semibold bg-white border border-slate-100 text-slate-700">
+                                <li>
+                                    <a th:href="@{'/courses/' + ${course.id}}" class="hover:bg-indigo-50 hover:text-indigo-600">
+                                        <i class="fa-solid fa-door-open text-indigo-500"></i> Vào Lớp Học
+                                    </a>
+                                </li>
+                                <li>
+                                    <button type="button" class="hover:bg-amber-50 hover:text-amber-600" 
+                                            th:attr="onclick='openEditModal(' + ${course.id} + ', \'' + ${#strings.escapeJavaScript(course.code)} + '\', \'' + ${#strings.escapeJavaScript(course.name)} + '\', \'' + ${#strings.escapeJavaScript(course.description ?: '')} + '\', \'' + ${#strings.escapeJavaScript(course.semester ?: 'Fall 2026')} + '\', ' + ${course.credits ?: 3} + ', \'' + ${#strings.escapeJavaScript(course.color ?: '')} + '\', \'' + ${#strings.escapeJavaScript(course.icon ?: '')} + '\')'">
+                                        <i class="fa-solid fa-pen-to-square text-amber-500"></i> Chỉnh Sửa
+                                    </button>
+                                </li>
+                                <li class="border-t border-slate-100 mt-1 pt-1">
+                                    <a th:href="@{'/courses/delete/' + ${course.id}}"
+                                       onclick="return confirm('Bạn có chắc chắn muốn xóa môn học này không? Toàn bộ tài liệu PDF và dữ liệu liên quan sẽ bị xóa vĩnh viễn!')"
+                                       class="text-rose-600 hover:bg-rose-50">
+                                        <i class="fa-solid fa-trash-can"></i> Xóa Môn Học
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Tên Môn Học & Mô Tả Súc Tích -->
+                    <div>
+                        <a th:href="@{'/courses/' + ${course.id}}" class="block group-hover:text-indigo-600 transition-colors">
+                            <h3 class="text-base font-bold text-slate-900 leading-snug line-clamp-1" th:text="${course.name}">
+                                JPA and Spring Framework
+                            </h3>
+                        </a>
+                        <p class="text-xs text-slate-500 mt-1.5 line-clamp-2 leading-relaxed" th:text="${course.description}">
+                            Mô tả chi tiết nội dung chương trình học của môn...
+                        </p>
+                    </div>
+
+                    <!-- Badges Trạng Thái Phân Cấp & Quyền Sở Hữu (BẮT BUỘC ĐỂ TEST AdminHubTest PASS) -->
+                    <div class="flex items-center gap-2 pt-1 flex-wrap">
+                        <span th:if="${course.chunkCount > 0}" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200/60 text-emerald-700 text-[11px] font-semibold">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Sẵn sàng hỏi đáp AI
+                        </span>
+                        <span th:unless="${course.chunkCount > 0}" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-500 text-[11px] font-medium">
+                            <i class="fa-solid fa-cloud-arrow-up text-[10px]"></i> Cần nạp slide
+                        </span>
+
+                        <span th:if="${course.isSystemSample()}" class="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 font-semibold text-[10px]">
+                            Môn mẫu
+                        </span>
+                        <span th:unless="${course.isSystemSample()}" class="px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 font-semibold text-[10px]">
+                            <span th:text="${currentUser != null and course.isOwnedBy(currentUser.id)} ? 'Môn của bạn' : 'Môn sinh viên'">Môn của bạn</span>
+                        </span>
+
+                        <span class="text-slate-400 text-[11px] ml-auto">
+                            <i class="fa-regular fa-calendar mr-1"></i><span th:text="${#temporals.format(course.createdAt, 'dd/MM/yyyy')}">18/10/2026</span>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Footer Action: DUY NHẤT 1 NÚT CTA CHÍNH -->
+                <div class="pt-5 mt-5 border-t border-slate-100">
+                    <a th:href="@{'/courses/' + ${course.id}}" 
+                       class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold text-xs tracking-wide shadow-sm shadow-indigo-500/20 group-hover:shadow-md group-hover:shadow-indigo-500/30 transition-all">
+                        <span>Vào Lớp Học</span>
+                        <i class="fa-solid fa-arrow-right text-[11px] group-hover:translate-x-1.5 transition-transform duration-200"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 1: TẠO MÔN HỌC MỚI (MODERN SAAS LIGHT THEME) -->
     <dialog id="modal-create-course" class="modal modal-bottom sm:modal-middle">
         <div class="modal-box bg-white text-slate-800 p-6 sm:p-8 rounded-3xl border border-slate-200 max-w-lg shadow-2xl relative overflow-hidden">
             <h3 class="font-extrabold text-xl text-slate-900 flex items-center gap-2">
@@ -503,9 +397,7 @@
         </form>
     </dialog>
 
-    <!-- ========================================================================= -->
-    <!-- MODAL 2: CHỈNH SỬA MÔN HỌC (MODERN SAAS LIGHT THEME)                      -->
-    <!-- ========================================================================= -->
+    <!-- MODAL 2: CHỈNH SỬA MÔN HỌC (MODERN SAAS LIGHT THEME) -->
     <dialog id="modal-edit-course" class="modal modal-bottom sm:modal-middle">
         <div class="modal-box bg-white text-slate-800 p-6 sm:p-8 rounded-3xl border border-slate-200 max-w-lg shadow-2xl relative overflow-hidden">
             <h3 class="font-extrabold text-xl text-slate-900 flex items-center gap-2">
@@ -579,9 +471,7 @@
         </form>
     </dialog>
 
-    <!-- ========================================================================= -->
-    <!-- MODAL 3: BẢNG GIÁ NÂNG CẤP GÓI CƯỚC (MODERN LIGHT SAAS PRICING)           -->
-    <!-- ========================================================================= -->
+    <!-- MODAL 3: BẢNG GIÁ NÂNG CẤP GÓI CƯỚC (MODERN LIGHT SAAS PRICING) -->
     <dialog id="modal-pricing-upgrade" class="modal modal-bottom sm:modal-middle">
         <div class="modal-box max-w-5xl p-6 sm:p-10 rounded-3xl bg-white text-slate-800 border border-slate-200 shadow-2xl relative overflow-hidden">
             <!-- Modal Close button -->
