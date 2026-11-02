@@ -231,6 +231,11 @@ public class AuthService {
             return List.of();
         }
 
+        // CHỈ trả về thành viên nhóm nếu người này thuộc gói SQUAD hoặc là ADMIN
+        if (!leader.isSquad() && !leader.isAdmin()) {
+            return List.of();
+        }
+
         String actualLeader = (leader.getSquadLeaderUsername() != null && !leader.getSquadLeaderUsername().isBlank())
                 ? leader.getSquadLeaderUsername()
                 : leader.getUsername();

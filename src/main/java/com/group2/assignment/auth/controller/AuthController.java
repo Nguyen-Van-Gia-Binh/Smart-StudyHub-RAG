@@ -7,6 +7,7 @@ import com.group2.assignment.auth.dto.RegisterRequestDto;
 import com.group2.assignment.auth.dto.UpdateProfileDto;
 import com.group2.assignment.auth.entity.User;
 import com.group2.assignment.auth.repository.UserRepository;
+import com.group2.assignment.core.repository.CourseRepository;
 import com.group2.assignment.auth.service.AuthService;
 import com.group2.assignment.auth.service.JwtService;
 import jakarta.servlet.http.Cookie;
@@ -30,6 +31,7 @@ public class AuthController {
     private final AuthService authService;
     private final JwtService jwtService;
     private final UserRepository userRepository;
+    private final CourseRepository courseRepository;
 
     public static final String AUTH_COOKIE_NAME = "STUDYHUB_JWT";
     public static final String SESSION_USER = "currentUser";
@@ -139,7 +141,11 @@ public class AuthController {
         }
         model.addAttribute("user", user);
 
-        // Nạp danh sách thành viên nhóm học tập Study Squad
+        // Đếm số môn học cá nhân do sinh viên sở hữu
+        long myCourseCount = (user.getId() != null) ? courseRepository.countByUserId(user.getId()) : 0;
+        model.addAttribute("myCourseCount", myCourseCount);
+
+        // Nạp danh sách thành viên nhóm học tập Study Squad (chỉ khi là SQUAD hoặc ADMIN)
         List<User> squadMembers = authService.getSquadMembers(user.getUsername());
         model.addAttribute("squadMembers", squadMembers);
         model.addAttribute("isSquadLeader", user.isSquadLeader());
