@@ -5,7 +5,7 @@
 > **Đội ngũ thực hiện**: Nhóm 2 (Group 2)  
 > **Nhánh Git chung**: `main`  
 > **Tài liệu theo dõi lỗi**: [`docs/issues/ISSUES-TRACKING.md`](../issues/ISSUES-TRACKING.md)  
-> **Thư mục lưu ảnh minh chứng**: `docs/evidence/`
+> **Thư mục lưu ảnh minh chứng**: `docs/evidence/[tên_thành_viên]/` (Phân chia theo từng thư mục thành viên: `tung/`, `truong/`, `binh/`, `thanh/`, `nhat/`, `an/`)
 
 ---
 
@@ -17,8 +17,8 @@
    - Kiểm thử độc lập trên **các tài khoản demo được cấp riêng**, không giẫm chân lên dữ liệu của nhau (nhờ cơ chế Data Isolation theo `user_id`).
 3. **Bắt buộc chụp ảnh màn hình (Screenshot Evidence)**:
    - Mỗi test case hoàn thành **bắt buộc phải có 1 ảnh chụp màn hình rõ nét** minh chứng kết quả.
-   - Đặt tên file ảnh chuẩn: `[Mã_Test]_[Tên_Thành_Viên].png` (Ví dụ: `E2E-CORE-01_tung.png`, `E2E-PLAN-02_thang.png`).
-   - Lưu toàn bộ ảnh vào thư mục `docs/evidence/` và commit lên repo.
+   - Đặt tên file ảnh chuẩn: `[Mã_Test]_[Tên_Thành_Viên].png` (Ví dụ: `E2E-CORE-01_tung.png`, `E2E-PLAN-02_thanh.png`).
+   - Lưu toàn bộ ảnh vào đúng thư mục thành viên: `docs/evidence/[tên_thành_viên]/` (ví dụ: `docs/evidence/tung/E2E-CORE-01_tung.png`) và commit lên repo.
 4. **Quy trình khi phát hiện lỗi**:
    - Nếu phát hiện lỗi (nút bấm không chạy, vỡ layout, logic không chặn đúng hạn ngạch): **Mở ngay file [`docs/issues/ISSUES-TRACKING.md`](../issues/ISSUES-TRACKING.md)**, điền thông tin theo mẫu issue để cùng fix ngay.
 
@@ -256,7 +256,7 @@
 
 * **Bắt đầu**: 13:00 - Thứ Hai, 02/11/2026
 * **Hạn chót nộp ảnh bằng chứng**: **20:00 - Thứ Hai, 02/11/2026**
-* **Địa điểm nộp ảnh**: Thư mục `docs/evidence/` trên repo theo cú pháp `[Mã_Test]_[Tên_Thành_Viên].png`.
+* **Địa điểm nộp ảnh**: Thư mục thành viên tương ứng tại `docs/evidence/[tên_thành_viên]/` trên repo theo cú pháp `[Mã_Test]_[Tên_Thành_Viên].png`.
 * **Tổng kết & Khắc phục lỗi**: 20:30 - Thứ Hai, 02/11/2026: Leader Tùng cùng cả nhóm rà soát file `docs/issues/ISSUES-TRACKING.md` để đóng tất cả các bug còn tồn đọng.
 
 Chúc toàn đội Nhóm 2 test mượt mà, bắt trọn bug và bảo vệ đồ án xuất sắc đạt điểm A+! 🚀
