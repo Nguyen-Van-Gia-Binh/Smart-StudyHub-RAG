@@ -31,9 +31,16 @@
 
 | Mã Issue | Ngày tạo | Người báo | Phân hệ | Mô tả lỗi vắn tắt | Mức độ | Người sửa (Assignee) | Trạng thái | Commit Fix / Ghi chú |
 | :---: | :---: | :---: | :---: | :--- | :---: | :---: | :---: | :--- |
+| Mã Issue | Ngày tạo | Người báo | Phân hệ | Mô tả lỗi vắn tắt | Mức độ | Người sửa (Assignee) | Trạng thái | Commit Fix / Ghi chú |
+| :---: | :---: | :---: | :---: | :--- | :---: | :---: | :---: | :--- |
 | **`#ISSUE-01`** | 02/11 | Tùng | `Auth / Profile` | Gói PRO hiển thị nhầm thẻ Quản lý nhóm và dòng chữ `"Bạn là thành viên nhóm @null"`, card Hạn ngạch RAG bị vỡ cột mô tả. | **🚨 HIGH** | **Trường / Tùng** | **✅ CLOSED** | Đã sửa trong commit [`9998765`](https://github.com/Tung-pro123/Smart-StudyHub-RAG/commit/9998765). Đã test 290/290 test passed. |
-| **`#ISSUE-02`** | 02/11 | Trường | `Auth / Login` | Nút đăng nhập 1-Click tài khoản demo không tự điền username/password (do thẻ script nằm ngoài thẻ section của layout). | **⚠️ MEDIUM** | **Trường** | `🔴 OPEN` | Cần chuyển thẻ `<script>` vào bên trong thẻ `<section>`. |
-| **`#ISSUE-03`** | 02/11 | Trường | `Auth / Profile` | Cập nhật hồ sơ đổi được họ tên nhưng không đổi được avatar khi chọn preset (do script selectAvatar nằm ngoài section). | **⚠️ MEDIUM** | **Trường** | `🔴 OPEN` | Cần chuyển thẻ `<script>` vào bên trong thẻ `<section>`. |
+| **`#ISSUE-02`** | 02/11 | Tùng | `UI / Navigation` | Tái cấu trúc Dashboard sang Sidebar dọc cố định bên trái, chuyển sang White-card Palette, đồng bộ màu sắc với Landing Page (Obsidian `#030712` + Gradient tím hồng), gỡ dropdown học kỳ cứng nhắc để tự do mọi trường (BYOC). | **⚠️ MEDIUM** | **Tùng** | **🟢 RESOLVED** | Hoàn tất trên nhánh `feature/tung-e2e-testing`. UI chuẩn hiện đại, responsive drawer, đồng bộ tông Landing Page. |
+| **`#ISSUE-03`** | 02/11 | Tùng / Trường | `Auth / Login UI` | Nút con mắt xem mật khẩu và nút đăng nhập 1-Click tài khoản demo ở `/login` không hoạt động do thẻ `<script>` nằm ngoài thẻ `<section>` bị Thymeleaf loại bỏ. | **⚠️ MEDIUM** | **Tùng / Trường** | **🟢 RESOLVED** | Đã di chuyển `<script>` vào trong `<section>` ở `login.html`, toggle password và fillDemo chạy mượt mà. |
+| **`#ISSUE-04`** | 02/11 | Tùng | `Core / Database` | Tài khoản test `student` trong DB bị set nhầm `PRO` và chứa 5 môn học, gây sai lệch khi test Data Isolation và Hạn mức 3 môn Free. | **🚨 HIGH** | **Tùng** | **🟢 RESOLVED** | Đã reset `subscription_tier = 'FREE'` và chuyển các môn test sang tài khoản Pro/Admin, chuẩn hóa student về đúng 2 môn ban đầu (`HSF302`, `MAS291`). |
+| **`#ISSUE-05`** | 02/11 | Tùng | `Core / Database` | Lỗi vi phạm Unique Index `IDX_COURSES_CODE_INDEX_1` khi tạo môn học có mã đã tồn tại ở người dùng khác do ràng buộc UNIQUE cũ trong H2 DB chưa được drop. | **🚨 HIGH** | **Tùng** | **🟢 RESOLVED** | Đã drop constraint UNIQUE toàn cục `IDX_COURSES_CODE`, chuyển thành index thông thường để đảm bảo phân lập dữ liệu đa người dùng (Data Isolation). |
+| **`#ISSUE-06`** | 02/11 | Tùng | `UI / Pricing Modal` | Nút chuyển đổi kỳ thanh toán 'Theo Học Kỳ' trong modal Bảng giá không bấm được do khối script nằm ngoài thẻ `<section>` bị Thymeleaf layout decorator loại bỏ. | **⚠️ MEDIUM** | **Tùng** | **🟢 RESOLVED** | Đã di chuyển khối `<script>` vào bên trong thẻ `<section>` ở `index.html`, bổ sung ID cập nhật giá và đồng bộ dải gradient Landing Page cho tab kích hoạt. |
+| **`#ISSUE-07`** | 02/11 | Tùng | `UI / Course Hub` | Giao diện Chi Tiết Môn Học (`courses/detail.html`) đang dùng tông nền thẻ tối cũ (`bg-slate-900`), chưa đồng bộ với White-Card Palette và gradient tím hồng Landing Page. | **⚠️ MEDIUM** | **Tùng** | **🟢 RESOLVED** | Hoàn tất bởi Lead Tùng. Chuyển đổi 4 gateway cards và Knowledge Base sang White-Card Palette, đồng bộ gradient Landing Page tím hồng, accordion chunks hiện đại. |
+| **`#ISSUE-08`** | 02/11 | Trường | `Auth / Profile` | Cập nhật hồ sơ đổi được họ tên nhưng không đổi được avatar khi chọn preset (do script `selectAvatar` nằm ngoài `<section>` trong `profile.html`). | **⚠️ MEDIUM** | **Trường** | **🟢 RESOLVED** | Chuyển thẻ `<script>` vào bên trong thẻ `<section>` của `profile.html`. |
 
 ---
 
@@ -68,6 +75,55 @@
 
 ---
 
+### 🐛 [#ISSUE-02]: Cải Tiến Giao Diện Dashboard & Điều Hướng Dọc Trái (Vertical Sidebar)
+* **Người báo lỗi / đề xuất**: Tùng (Team Lead)
+* **Phân hệ**: Core Dashboard / Navigation Layout
+* **Tài khoản test**: Toàn bộ tài khoản (`student`, `pro_student`, `admin`)
+* **Mức độ**: ⚠️ MEDIUM (UI Transformation & Progressive Disclosure)
+* **Người sửa (Assignee)**: Tùng
+* **Trạng thái**: 🟢 RESOLVED
+* **Mô tả & Khắc phục**:
+  1. Chuyển đổi Navbar ngang sang Vertical Navigation Sidebar (`layout/main.html` + `sidebar.html`) cố định bên trái màn hình (`lg:drawer-open`).
+  2. Áp dụng bảng màu White-card Palette tinh tế, tối giản, tương thích màu sắc landing page: Hero banner Obsidian `#030712`, hiệu ứng Ambient Cyber Glow cyan/violet, các nút CTA đồng bộ gradient Landing Page (`from-purple-600 via-violet-600 to-pink-600`).
+  3. Thay thế thông báo flash thành công/lỗi màu xanh thô bằng Toast Cards bo tròn thanh thoát `bg-emerald-50/95` và `bg-rose-50/95`.
+  4. Gỡ bỏ dropdown `<select name="semester">` cứng nhắc, thay bằng tìm kiếm từ khóa tự do cho sinh viên mọi trường đại học (BYOC).
+
+---
+
+### 🐛 [#ISSUE-03]: Nút Biểu Tượng Con Mắt Xem Mật Khẩu Không Bấm Được Tại `/login`
+* **Người báo lỗi**: Tùng (Team Lead)
+* **Phân hệ**: Auth / Login Page
+* **Tài khoản test**: Mọi người dùng truy cập `http://localhost:8080/login`
+* **Mức độ**: ⚠️ MEDIUM
+* **Người sửa (Assignee)**: Tùng
+* **Trạng thái**: 🟢 RESOLVED
+* **Nguyên nhân**:
+  - `login.html` sử dụng layout decorator: `th:replace="~{layout/main :: main-layout(..., ~{::section})}"`.
+  - Khối `<script>` chứa hàm `togglePasswordVisibility()` và `fillDemo()` bị đặt ở cuối file ngoài thẻ `<section>`, dẫn đến Thymeleaf loại bỏ toàn bộ script khi render.
+* **Khắc phục**:
+  - Đưa toàn bộ khối `<script>` vào bên trong thẻ `<section>`.
+  - Kiểm tra `togglePasswordVisibility('login-password', this)`: chuyển đổi `type="password"` <-> `type="text"` và đổi icon `fa-eye` <-> `fa-eye-slash` chính xác.
+
+---
+
+### 🐛 [#ISSUE-04]: Tài Khoản `student` Bị Nhầm Gói PRO & Dư Thừa 5 Môn Học Trong Database
+* **Người báo lỗi**: Tùng (Team Lead)
+* **Phân hệ**: Core / Data Isolation & Quota Gating
+* **Tài khoản test**: `student`
+* **Mức độ**: 🚨 HIGH (Sai lệch dữ liệu kiểm thử nghiệp vụ)
+* **Người sửa (Assignee)**: Tùng
+* **Trạng thái**: 🟢 RESOLVED
+* **Nguyên nhân**:
+  - Do các lượt test nâng cấp và tạo môn trước đó, tài khoản `student` trong file DB cục bộ (`./data/studyhubdb.mv.db`) bị chuyển thành gói `PRO` và sở hữu 5 môn học (`HSF302`, `MAS291`, `SWP391`, `DBI201`, `CSD201`).
+  - Khi Tùng đăng nhập để test `E2E-CORE-02` (Data Isolation) và `E2E-CORE-03` (Hạn mức Free 3 môn), tài khoản hiển thị 5 môn và không thể kiểm tra logic chặn môn thứ 4.
+* **Khắc phục**:
+  - Chạy script cập nhật H2 Database:
+    - Đặt lại `subscription_tier = 'FREE'` cho `student`.
+    - Chuyển giao 3 môn test (SWP391, DBI201, CSD201) sang tài khoản Pro/Admin để bảo lưu dữ liệu.
+    - Tài khoản `student` hiện tại sở hữu đúng 2 môn ban đầu: `HSF302` và `MAS291`.
+
+---
+
 ## 🛠️ 5. HƯỚNG DẪN DÀNH CHO NGƯỜI SỬA LỖI (ASSIGNEE)
 
 1. **Đọc kỹ các bước tái hiện**: Tự chạy app trên máy mình và làm theo các bước trong issue để quan sát lỗi trực tiếp.
@@ -85,58 +141,72 @@
    - Báo cho người phát hiện lỗi kiểm tra lại lần cuối để đóng issue sang `✅ CLOSED`.
 
 
+### 🐛 [#ISSUE-05]: Lỗi Vi Phạm Unique Index `IDX_COURSES_CODE_INDEX_1` Khi Tạo Môn Trùng Mã Với Người Khác
+* **Người báo lỗi**: Tùng (Team Lead)
+* **Phân hệ**: Core / Data Isolation & Course Management
+* **Tài khoản test**: `student`
+* **Mức độ**: 🚨 HIGH (Chặn đứng thao tác tạo môn học của người dùng)
+* **Người sửa (Assignee)**: Tùng
+* **Trạng thái**: 🟢 RESOLVED
+* **Nguyên nhân**:
+  - Trong bảng `COURSES` của H2 Database cục bộ (`./data/studyhubdb.mv.db`), có tồn tại một ràng buộc UNIQUE cũ tên `IDX_COURSES_CODE` trên cột `code`.
+  - Nghiệp vụ của StudyHub AI đã nâng cấp sang cơ chế Data Isolation (phân lập dữ liệu đa người dùng), cho phép các sinh viên khác nhau đều có thể tự do tạo môn học cùng mã (như `DBI201`, `HSF302`, `PRJ301`). Validation ở `CourseService` kiểm tra trùng theo cặp `(code, user_id)`.
+  - Do cấu hình Hibernate `ddl-auto=update` không tự drop các ràng buộc UNIQUE cũ trong database thực tế, khi `admin` đang giữ môn `DBI201` thì `student` tạo môn `DBI201` bị database chặn lại và báo lỗi `Unique index or primary key violation: IDX_COURSES_CODE_INDEX_1`.
+* **Khắc phục**:
+  - Chạy script SQL trực tiếp trên H2 Database:
+    ```sql
+    ALTER TABLE COURSES DROP CONSTRAINT IF EXISTS IDX_COURSES_CODE;
+    CREATE INDEX IF NOT EXISTS IDX_COURSES_CODE ON COURSES(CODE);
+    ```
+  - Kiểm tra lại: Sinh viên có thể tạo môn học độc lập mà không bị xung đột với môn của tài khoản khác; đồng thời trong cùng một tài khoản vẫn được chặn trùng lặp mã qua `CourseService`.
 
 ---
 
-### 🐛 [#ISSUE-02]: Nút đăng nhập 1-Click tại login.html không tự điền thông tin tài khoản demo
-* **Người báo lỗi**: Ngô Nhật Trường
-* **Phân hệ**: Auth / Login
-* **Tài khoản dùng để test**: `squad_leader`
-* **Mức độ nghiêm trọng**: ⚠️ MEDIUM
-* **Người chịu trách nhiệm sửa (Assignee)**: Trường
-* **Trạng thái**: 🔴 OPEN
-
-#### 1. Các bước tái hiện lỗi (Steps to Reproduce):
-1. Truy cập vào trang: `http://localhost:8080/login`
-2. Nhấp vào các huy hiệu tài khoản demo: `[FREE: student]`, `[PRO: pro_student]`, `[SQUAD: squad_leader]`, `[ADMIN: admin]`
-3. Quan sát 2 ô nhập liệu Tên Đăng Nhập và Mật Khẩu.
-
-#### 2. Kết quả thực tế bị lỗi (Actual Result):
-* Hai ô nhập liệu vẫn để trống, không tự điền username và password `123456`.
-* Mở Console trình duyệt báo lỗi `Uncaught ReferenceError: fillDemo is not defined`.
-* **Nguyên nhân**: Thẻ `<script>` chứa hàm `fillDemo()` đặt sau thẻ `</section>`, trong khi layout Thymeleaf chỉ trích xuất `~{::section}` nên thẻ script bị loại bỏ khi render.
-
-#### 3. Kết quả kỳ vọng đúng (Expected Result):
-* Khi nhấp vào huy hiệu demo, ô username và password phải tự động điền giá trị tương ứng để người dùng đăng nhập ngay lập tức.
-
-#### 4. Ảnh chụp màn hình lỗi (Screenshot Evidence):
-* `![Screenshot](../evidence/truong/E2E-AUTH-01_truong.png)`
+### 🐛 [#ISSUE-06]: Nút Chuyển Đổi Kỳ Thanh Toán 'Theo Học Kỳ' Không Bấm Được Trong Modal Bảng Giá
+* **Người báo lỗi**: Tùng (Team Lead)
+* **Phân hệ**: UI / Pricing Upgrade Modal (`index.html`)
+* **Tài khoản test**: Mọi tài khoản (`student`, `pro_student`)
+* **Mức độ**: ⚠️ MEDIUM (Ảnh hưởng trải nghiệm người dùng xem gói cước)
+* **Người sửa (Assignee)**: Tùng
+* **Trạng thái**: 🟢 RESOLVED
+* **Nguyên nhân**:
+  - `index.html` sử dụng layout decorator: `th:replace="~{layout/main :: main-layout(..., ~{::section})}"`.
+  - Khối `<script>` chứa hàm `switchBillingPeriod()` và `openEditModal()` bị đặt ở cuối file ngoài thẻ `<section>`, dẫn đến Thymeleaf loại bỏ toàn bộ script khi render giao diện trình duyệt.
+  - Khi người dùng nhấn vào nút "Theo Học Kỳ" (`tab-semester`), trình duyệt báo lỗi `Uncaught ReferenceError: switchBillingPeriod is not defined`.
+* **Khắc phục**:
+  - Đưa toàn bộ khối `<script>` vào bên trong thẻ `<section>`.
+  - Bổ sung `id="card-squad-price"` và `id="card-squad-period"` vào thẻ Gói Nhóm để cập nhật giá đồng bộ.
+  - Đồng bộ dải màu gradient Landing Page (`from-purple-600 via-violet-600 to-pink-600`) cho tab đang chọn.
 
 ---
 
-### 🐛 [#ISSUE-03]: Chọn Avatar Presets tại profile.html đổi được họ tên nhưng avatar không cập nhật
+### 🐛 [#ISSUE-07]: Đồng Bộ Giao Diện Course Detail Hub (`courses/detail.html`) Sang White-Card Palette
+* **Người báo lỗi / đề xuất**: Tùng (Team Lead)
+* **Phân hệ**: UI / Course Detail Hub (`courses/detail.html`)
+* **Tài khoản test**: Mọi sinh viên truy cập màn hình chi tiết môn học (`student`, `pro_student`)
+* **Mức độ**: ⚠️ MEDIUM (Chuẩn hóa Design System toàn ứng dụng)
+* **Người sửa (Assignee)**: Bình & Trường (Phối hợp thực hiện theo chỉ đạo của Lead Tùng)
+* **Trạng thái**: 🟢 RESOLVED
+* **Mô tả & Yêu cầu khắc phục**:
+  1. Chuyển đổi 4 thẻ phân hệ cấp độ 2 (Trợ Lý RAG, Tài Liệu Slide, Lịch Học Vừa Sức, Luyện Đề Trắc Nghiệm) từ thẻ tối `bg-slate-900/85` sang **White-Card Palette** (`bg-white/95 border-slate-200/80 text-slate-800 shadow-sm hover:shadow-lg`).
+  2. Đồng bộ nút bấm CTA sang dải gradient chuẩn của Landing Page: `bg-gradient-to-r from-purple-600 via-violet-600 to-pink-600`.
+  3. Cải tiến khối "Cơ Sở Tri Thức Của Môn Học" và trạng thái rỗng (empty state) sang phong cách sáng, sạch sẽ, tinh tế.
+
+---
+
+### 🐛 [#ISSUE-08]: Chọn Avatar Presets tại profile.html đổi được họ tên nhưng avatar không cập nhật
 * **Người báo lỗi**: Ngô Nhật Trường
 * **Phân hệ**: Auth / Profile
 * **Tài khoản dùng để test**: `squad_leader`
 * **Mức độ nghiêm trọng**: ⚠️ MEDIUM
-* **Người chịu trách nhiệm sửa (Assignee)**: Trường
-* **Trạng thái**: 🔴 OPEN
-
-#### 1. Các bước tái hiện lỗi (Steps to Reproduce):
-1. Đăng nhập vào tài khoản `squad_leader`
-2. Truy cập vào trang: `http://localhost:8080/profile`
-3. Nhấp chọn 1 trong 6 hình avatar mẫu (presets) bên dưới
-4. Bấm nút "Lưu Cập Nhật Hồ Sơ".
-
-#### 2. Kết quả thực tế bị lỗi (Actual Result):
-* Họ tên hiển thị cập nhật thành công nhưng ảnh đại diện vẫn giữ nguyên ảnh cũ.
-* **Nguyên nhân**: Thẻ `<script>` chứa hàm `selectAvatar()` đặt sau thẻ `</section>`, khiến hàm không được gọi khi click, giá trị trong input hidden `avatar` không thay đổi.
-
-#### 3. Kết quả kỳ vọng đúng (Expected Result):
-* Khi click chọn avatar preset, viền avatar được highlight, ảnh đại diện xem trước đổi ngay và khi bấm Lưu thì database cập nhật avatar mới.
-
-#### 4. Ảnh chụp màn hình lỗi (Screenshot Evidence):
-* `![Screenshot](../evidence/truong/E2E-AUTH-03_truong.png)`
+* **Người chịu trách nhiệm sửa (Assignee)**: Trường / Tùng
+* **Trạng thái**: 🟢 RESOLVED
+* **Nguyên nhân**:
+  - Thẻ `<script>` chứa hàm `selectAvatar()` đặt sau thẻ `</section>`, khiến hàm không được gọi khi click, giá trị trong input hidden `avatar` không thay đổi.
+* **Khắc phục**:
+  - Di chuyển toàn bộ thẻ `<script>` vào bên trong thẻ `<section>` ở `profile.html`.
+* **Ảnh chụp màn hình lỗi**:
+  - `![Screenshot](../evidence/truong/E2E-AUTH-03_truong.png)`
 
 ---
 
@@ -169,4 +239,4 @@ Các mục QA dưới đây được tách khỏi lỗi chức năng `ISSUE-01..
 
 ### Đối chiếu lỗi Auth đã có
 
-Lần chạy QA Admin tái hiện nút “FREE student” trên `/login` không tự điền form. Đây là **ISSUE-02 hiện có**, không tạo issue trùng; đã nhập thông tin demo thủ công để tiếp tục 6 case Admin.
+Lần chạy QA Admin tái hiện nút “FREE student” trên `/login` không tự điền form. Đây là **ISSUE-03 đã được giải quyết** bằng việc chuyển script vào bên trong section trên `feature/tung-e2e-testing`.
