@@ -27,7 +27,7 @@
             <a th:href="@{'/quiz?courseId=' + ${quiz.course != null ? quiz.course.id : 1}}" class="btn btn-sm btn-ghost rounded-xl text-xs font-bold text-slate-500 gap-1.5">
                 <i class="fa-solid fa-arrow-left"></i> Rời phòng thi
             </a>
-            <button type="button" onclick="handlePreSubmitCheck()" class="btn btn-sm bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl border-none shadow-md gap-2">
+            <button type="button" onclick="handlePreSubmitCheck()" class="btn btn-sm bg-gradient-to-r from-purple-600 via-violet-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold rounded-xl border-none shadow-lg shadow-purple-500/25 gap-2">
                 <i class="fa-solid fa-paper-plane"></i>
                 <span>Nộp Bài Thi</span>
             </button>
@@ -40,8 +40,8 @@
 
         <div class="flex flex-col lg:flex-row gap-6 items-start">
 
-            <!-- CỘT TRÁI: Dòng Chảy Câu Hỏi (Question Stream) -->
-            <div class="w-full lg:w-2/3 space-y-6">
+            <!-- CỘT CÂU HỎI (desktop 3/4) -->
+            <div class="w-full lg:w-3/4 space-y-6">
 
                 <!-- Card Nhập Tên Thí Sinh -->
                 <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -78,7 +78,7 @@
                     </div>
 
                     <!-- 4 Lựa chọn A, B, C, D dạng Thẻ Radio Lớn -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                    <div class="grid grid-cols-1 gap-3 pt-2">
                         <label class="cursor-pointer border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/20 p-4 rounded-2xl flex items-start gap-3 transition-all duration-150 has-[:checked]:border-indigo-600 has-[:checked]:bg-indigo-50/50 has-[:checked]:ring-1 has-[:checked]:ring-indigo-600">
                             <input type="radio" th:name="'answer_' + ${q.id}" value="A"
                                    th:attr="data-qid=${q.id}"
@@ -128,15 +128,15 @@
                 <!-- Nút nộp bài ở cuối trang -->
                 <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between">
                     <span class="text-xs text-slate-500">Kiểm tra kỹ trước khi gửi bài chấm điểm</span>
-                    <button type="button" onclick="handlePreSubmitCheck()" class="btn btn-md bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold rounded-2xl border-none shadow-lg shadow-emerald-600/20 px-8 gap-2">
+                    <button type="button" onclick="handlePreSubmitCheck()" class="btn btn-md bg-gradient-to-r from-purple-600 via-violet-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold rounded-2xl border-none shadow-lg shadow-purple-500/25 px-8 gap-2">
                         <i class="fa-solid fa-paper-plane"></i>
                         <span>Nộp Bài Thi Ngay</span>
                     </button>
                 </div>
             </div>
 
-            <!-- CỘT PHẢI: Sticky Palette Điều Hướng Ma Trận Câu Hỏi & Đồng Hồ -->
-            <div class="w-full lg:w-1/3 sticky top-6 space-y-4">
+            <!-- CỘT PALETTE + ĐỒNG HỒ (desktop 1/4, mobile nằm trên) -->
+            <div class="w-full lg:w-1/4 order-first lg:sticky lg:top-6 space-y-4">
 
                 <!-- Widget Đồng Hồ Đếm Ngược -->
                 <div class="bg-gradient-to-br from-indigo-900 to-slate-900 text-white p-5 rounded-3xl shadow-lg border border-indigo-800">
@@ -197,7 +197,7 @@
                 </div>
 
                 <!-- Nút nộp bài trực tiếp ở Sidebar -->
-                <button type="button" onclick="handlePreSubmitCheck()" class="btn btn-block bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl border-none shadow-md gap-2">
+                <button type="button" onclick="handlePreSubmitCheck()" class="btn btn-block bg-gradient-to-r from-purple-600 via-violet-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold rounded-2xl border-none shadow-lg shadow-purple-500/25 gap-2">
                     <i class="fa-solid fa-check"></i>
                     <span>Nộp Bài Thi</span>
                 </button>
@@ -234,6 +234,14 @@
         let totalSeconds = totalMinutes * 60;
         let timeElapsed = 0;
         const answeredQuestions = new Set();
+        let quizSubmitted = false;
+
+        // Canh bao khi F5 hoac roi trang giua chung
+        window.addEventListener('beforeunload', function (e) {
+            if (quizSubmitted) return;
+            e.preventDefault();
+            e.returnValue = '';
+        });
 
         // 1. Timer Logic
         let timerInterval = setInterval(function () {
@@ -296,6 +304,7 @@
         }
 
         function executeSubmit() {
+            quizSubmitted = true;
             clearInterval(timerInterval);
             document.getElementById('time-spent-seconds').value = timeElapsed;
             document.getElementById('quiz-form').submit();
