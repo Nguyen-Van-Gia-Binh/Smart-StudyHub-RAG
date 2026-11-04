@@ -66,6 +66,15 @@
 
                     <div class="flex flex-wrap items-center justify-center sm:justify-start gap-3 text-xs text-slate-300">
                         <span class="font-mono bg-white/10 px-2.5 py-1 rounded-lg text-purple-200 border border-white/10" th:text="'@' + ${user.username}">@student</span>
+                        <!-- Member Tag Code Badge with 1-click Copy -->
+                        <button type="button" 
+                                th:data-copy="${memberTag}" onclick="copyFromElement(this, 'Đã sao chép Member Tag: ' + this.getAttribute('data-copy'))"
+                                class="inline-flex items-center gap-1.5 font-mono font-bold bg-purple-500/20 hover:bg-purple-500/35 text-purple-200 border border-purple-400/30 px-2.5 py-1 rounded-lg transition-all duration-200 cursor-pointer"
+                                title="Nhấn để sao chép Member Tag">
+                            <i class="fa-solid fa-id-badge text-purple-300"></i>
+                            <span th:text="${memberTag}">#STU-0001</span>
+                            <i class="fa-regular fa-copy text-[10px] opacity-70"></i>
+                        </button>
                         <span class="flex items-center gap-1.5">
                             <i class="fa-solid fa-envelope text-purple-400"></i>
                             <span th:text="${user.email}">student@fpt.edu.vn</span>
@@ -263,6 +272,58 @@
         </div>
     </div>
 
+    <!-- 2.5 PENDING SQUAD REQUEST BANNER (Thành viên đang chờ Trưởng nhóm phê duyệt) -->
+    <div th:if="${isSquadPending}" class="rounded-2xl p-5 bg-amber-50/90 border border-amber-200/90 text-amber-900 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-lg flex-shrink-0">
+                <i class="fa-solid fa-hourglass-half"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h3 class="font-bold text-sm text-amber-950">Yêu Cầu Gia Nhập Nhóm Đang Chờ Phê Duyệt</h3>
+                    <span class="badge badge-warning text-[10px] font-bold">CHỜ DUYỆT</span>
+                </div>
+                <p class="text-xs text-amber-800 mt-0.5">
+                    Bạn đã gửi yêu cầu gia nhập Nhóm học tập của Trưởng nhóm <strong class="font-mono text-purple-700 font-bold">@<span th:text="${pendingSquadLeader}">leader</span></strong>. Khi được phê duyệt, bạn sẽ được tự động kích hoạt gói SQUAD!
+                </p>
+            </div>
+        </div>
+        <form th:action="@{/auth/squad/cancel-request}" method="post" class="flex-shrink-0">
+            <button type="submit" class="btn btn-sm btn-outline border-amber-300 hover:border-amber-400 text-amber-900 hover:bg-amber-100 rounded-xl text-xs font-bold gap-1.5"
+                    onclick="return confirm('Bạn có chắc chắn muốn hủy yêu cầu tham gia nhóm này?')">
+                <i class="fa-solid fa-xmark"></i> Hủy Yêu Cầu
+            </button>
+        </form>
+    </div>
+
+    <!-- 2.6 JOIN SQUAD BY INVITE CODE CARD (Dành cho thành viên tự học muốn nhập mã SQ-XXXX) -->
+    <div th:if="${!user.isSquad() and !isSquadPending and !user.isPro()}"
+         class="rounded-2xl p-6 bg-white/95 backdrop-blur-xl border border-slate-200/80 text-slate-800 shadow-sm space-y-4">
+        <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-lg flex-shrink-0">
+                <i class="fa-solid fa-ticket"></i>
+            </div>
+            <div>
+                <h3 class="font-black text-sm text-slate-900">Tham Gia Nhóm Học Tập Bằng Mã Mời (Squad Invite Code)</h3>
+                <p class="text-xs text-slate-500">Nhập mã mời từ Trưởng nhóm để gửi yêu cầu tham gia nhóm và nhận trọn quyền lợi PRO</p>
+            </div>
+        </div>
+
+        <form th:action="@{/auth/squad/join-by-code}" method="post" class="flex flex-col sm:flex-row gap-2.5 max-w-xl">
+            <div class="relative flex-1">
+                <i class="fa-solid fa-hashtag absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                <input type="text" name="inviteCode" required placeholder="Nhập mã mời dạng SQ-XXXX (ví dụ: SQ-0003)" 
+                       class="input input-bordered input-sm pl-9 w-full rounded-xl text-xs font-mono uppercase border-slate-200 focus:border-purple-500" />
+            </div>
+            <button type="submit" class="btn btn-sm bg-gradient-to-r from-purple-600 via-violet-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-xl text-xs font-bold border-none shadow-md shadow-purple-500/20 gap-1.5">
+                <i class="fa-solid fa-paper-plane"></i> Gửi Yêu Cầu Gia Nhập
+            </button>
+        </form>
+        <p class="text-[11px] text-slate-500">
+            💡 Sau khi gửi yêu cầu, Trưởng nhóm sẽ nhận được thông báo để xác thực và phê duyệt bạn vào nhóm (tối đa 5 thành viên).
+        </p>
+    </div>
+
     <!-- 3. SQUAD MANAGEMENT CARD (White-Card Palette - Tự động ẩn với PRO cá nhân) -->
     <div th:if="${user.isSquad() or (user.isAdmin() and squadMembers != null and !squadMembers.isEmpty())}"
          class="rounded-2xl p-6 sm:p-8 bg-white/95 backdrop-blur-xl border border-slate-200/80 text-slate-800 shadow-sm space-y-6">
@@ -280,7 +341,18 @@
                 </div>
             </div>
             
-            <div class="flex items-center gap-2">
+            <div class="flex flex-wrap items-center gap-2">
+                <!-- Squad Leader Shareable Invite Code Box -->
+                <div th:if="${isSquadLeader}" class="flex items-center gap-2 bg-purple-50 border border-purple-200/80 px-3 py-1.5 rounded-xl shadow-xs">
+                    <span class="text-xs font-semibold text-purple-700">Mã Mời Nhóm:</span>
+                    <span class="font-mono font-black text-xs text-purple-900 bg-white px-2 py-0.5 rounded-lg border border-purple-200" th:text="${squadInviteCode}">SQ-0003</span>
+                    <button type="button" class="btn btn-ghost btn-xs text-purple-600 hover:bg-purple-100 rounded-lg p-1"
+                            th:data-copy="${squadInviteCode}" onclick="copyFromElement(this, 'Đã sao chép Mã Mời Nhóm: ' + this.getAttribute('data-copy'))"
+                            title="Sao chép Mã Mời Nhóm">
+                        <i class="fa-regular fa-copy"></i>
+                    </button>
+                </div>
+
                 <span class="badge font-black text-xs gap-1.5 py-3 px-3.5 shadow-sm text-white bg-gradient-to-r from-purple-600 via-violet-600 to-pink-600 border-none">
                     <i class="fa-solid fa-user-group text-purple-200"></i>
                     <span th:text="${squadMembers != null ? squadMembers.size() : 1}">1</span> / <span th:text="${maxSquadMembers}">5</span> Thành Viên
@@ -295,8 +367,8 @@
             </label>
             <form th:action="@{/auth/squad/add-member}" method="post" class="flex flex-col sm:flex-row gap-2.5">
                 <div class="relative flex-1">
-                    <i class="fa-solid fa-at absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                    <input type="text" name="targetUsername" required placeholder="Nhập username bạn bè (ví dụ: student2, binh, an...)" 
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <input type="text" name="targetUsername" required placeholder="Nhập Username, Gmail hoặc Member Tag (#STU-XXXX)..." 
                            class="input input-bordered input-sm pl-9 w-full rounded-xl text-xs font-mono border-slate-200 focus:border-purple-500"
                            th:disabled="${squadMembers != null and squadMembers.size() >= maxSquadMembers}" />
                 </div>
@@ -306,11 +378,69 @@
                 </button>
             </form>
             <p th:if="${squadMembers != null and squadMembers.size() >= maxSquadMembers}" class="text-[11px] text-amber-600 font-semibold flex items-center gap-1">
-                <i class="fa-solid fa-circle-exclamation"></i> Nhóm đã đủ tối đa 5 thành viên! Để thêm bạn mới, hãy xóa bớt thành viên cũ.
+                <i class="fa-solid fa-circle-exclamation"></i> Nhóm đã đủ tối đa 5 thành viên! Để thêm hoặc duyệt bạn mới, hãy xóa bớt thành viên cũ.
             </p>
             <p th:unless="${squadMembers != null and squadMembers.size() >= maxSquadMembers}" class="text-[11px] text-slate-500">
-                💡 Khi thêm vào nhóm, bạn bè sẽ được nâng cấp lên hạng <strong>SQUAD</strong> và hưởng toàn bộ quyền lợi PRO ngay lập tức.
+                💡 Thêm trực tiếp bằng <strong>Username</strong>, <strong>Gmail</strong> hoặc <strong>Member Tag (#STU-XXXX)</strong>. Hoặc gửi Mã Mời <strong class="font-mono text-purple-700" th:text="${squadInviteCode}">SQ-XXXX</strong> để bạn bè tự gửi yêu cầu xin vào.
             </p>
+        </div>
+
+        <!-- Approval Queue Section (🔔 Yêu Cầu Chờ Phê Duyệt) -->
+        <div th:if="${isSquadLeader and pendingSquadRequests != null and !pendingSquadRequests.isEmpty()}" 
+             class="bg-amber-50/60 rounded-2xl border border-amber-200/80 p-5 space-y-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-amber-200/60 pb-3">
+                <div class="flex items-center gap-2 font-bold text-xs text-amber-900 uppercase tracking-wider">
+                    <span class="relative flex h-2.5 w-2.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+                    </span>
+                    <i class="fa-solid fa-bell text-amber-600"></i> Yêu Cầu Chờ Phê Duyệt (<span th:text="${pendingSquadRequests.size()}">1</span>)
+                </div>
+                <span class="text-[11px] text-amber-700">Sinh viên đã nhập mã mời của bạn và đang chờ xác thực để vào nhóm</span>
+            </div>
+
+            <div class="space-y-2.5">
+                <div th:each="req : ${pendingSquadRequests}"
+                     class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3.5 bg-white rounded-xl border border-amber-200/70 shadow-sm">
+                    <div class="flex items-center gap-3">
+                        <div class="avatar">
+                            <div class="w-10 h-10 rounded-xl ring-1 ring-slate-200 overflow-hidden bg-slate-100">
+                                <img th:src="${req.avatar}" alt="Avatar" referrerpolicy="no-referrer" />
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-xs text-slate-900" th:text="${req.fullName}">Tên Bạn Chờ</span>
+                                <span class="font-mono text-[10px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-lg border border-purple-200" th:text="${req.memberTag}">#STU-0005</span>
+                            </div>
+                            <div class="text-[11px] text-slate-500 flex flex-wrap items-center gap-2 mt-0.5 font-mono">
+                                <span th:text="'@' + ${req.username}">@username</span>
+                                <span>•</span>
+                                <span class="font-sans" th:text="${req.email}">email@fpt.edu.vn</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action buttons: Approve or Reject -->
+                    <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                        <form th:action="@{/auth/squad/approve-member}" method="post" class="inline">
+                            <input type="hidden" name="targetUsername" th:value="${req.username}" />
+                            <button type="submit" 
+                                    class="btn btn-xs bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold border-none gap-1 shadow-sm px-3"
+                                    th:disabled="${squadMembers != null and squadMembers.size() >= maxSquadMembers}"
+                                    th:title="${squadMembers != null and squadMembers.size() >= maxSquadMembers ? 'Nhóm đã đủ 5 người, không thể duyệt thêm' : 'Duyệt thành viên vào nhóm'}">
+                                <i class="fa-solid fa-check"></i> Duyệt Vào Nhóm
+                            </button>
+                        </form>
+                        <form th:action="@{/auth/squad/reject-member}" method="post" class="inline">
+                            <input type="hidden" name="targetUsername" th:value="${req.username}" />
+                            <button type="submit" class="btn btn-ghost btn-xs text-rose-500 hover:bg-rose-50 rounded-lg font-bold gap-1 px-2.5">
+                                <i class="fa-solid fa-xmark"></i> Từ Chối
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Member View: Thông báo cho thành viên nhóm (KHÔNG BAO GIỜ bị @null) -->
@@ -347,7 +477,10 @@
                             </div>
                         </td>
                         <td class="py-3">
-                            <span class="font-mono text-xs text-slate-600 font-semibold" th:text="'@' + ${m.username}">@user</span>
+                            <div class="flex flex-col">
+                                <span class="font-mono text-xs text-slate-700 font-semibold" th:text="'@' + ${m.username}">@user</span>
+                                <span class="font-mono text-[10px] text-purple-600" th:text="${m.memberTag}">#STU-0001</span>
+                            </div>
                         </td>
                         <td class="py-3">
                             <span th:if="${m.username == user.squadLeaderUsername or (user.squadLeaderUsername == null and m.username == user.username)}"
@@ -530,6 +663,64 @@
                     icon.classList.remove('fa-eye-slash');
                     icon.classList.add('fa-eye');
                 }
+            }
+
+            function copyFromElement(btn, message) {
+                if (!btn) return;
+                const text = btn.getAttribute('data-copy');
+                if (text) {
+                    copyToClipboard(text, message);
+                }
+            }
+
+            function copyToClipboard(text, message) {
+                if (!text) return;
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(text).then(function() {
+                        showToast(message || ('Đã sao chép: ' + text));
+                    }).catch(function() {
+                        fallbackCopy(text, message);
+                    });
+                } else {
+                    fallbackCopy(text, message);
+                }
+            }
+
+            function fallbackCopy(text, message) {
+                const temp = document.createElement('textarea');
+                temp.value = text;
+                temp.style.position = 'fixed';
+                temp.style.left = '-9999px';
+                temp.style.top = '-9999px';
+                document.body.appendChild(temp);
+                temp.focus();
+                temp.select();
+                try {
+                    document.execCommand('copy');
+                    showToast(message || ('Đã sao chép: ' + text));
+                } catch (e) {
+                    prompt('Sao chép mã bằng Ctrl+C:', text);
+                }
+                document.body.removeChild(temp);
+            }
+
+            function showToast(msg) {
+                let container = document.getElementById('squad-toast-container');
+                if (!container) {
+                    container = document.createElement('div');
+                    container.id = 'squad-toast-container';
+                    container.className = 'toast toast-top toast-end z-50';
+                    document.body.appendChild(container);
+                }
+                const toast = document.createElement('div');
+                toast.className = 'alert alert-info bg-purple-700 text-white shadow-2xl text-xs py-2.5 px-4 rounded-xl flex items-center gap-2 border border-purple-400/30';
+                toast.innerHTML = '<i class="fa-solid fa-circle-check text-purple-200"></i> <span>' + msg + '</span>';
+                container.appendChild(toast);
+                setTimeout(function() {
+                    toast.style.opacity = '0';
+                    toast.style.transition = 'opacity 0.3s ease';
+                    setTimeout(function() { toast.remove(); }, 300);
+                }, 2500);
             }
         </script>
     </div>
