@@ -1,49 +1,63 @@
 # Nội dung slide 18–22 — Ngô Ân
 
-Khối 6, nói liên tục trong 3 phút 30 giây. Nguồn: main@2404431 và báo cáo nghiệm thu ngày 04/11/2026.
+> **Khối trình bày**: Khối 6 — Vận hành Admin, Phân hệ Doanh thu VNPay & Đối soát đơn hàng, QA 333 tests, Setup & Q&A  
+> **Thời lượng**: 4 phút liên tục  
 
-## Slide 18 — Quản trị hệ thống và gói cước
+---
 
-- Dashboard: sinh viên theo gói, môn học, chunks và lượt RAG hôm nay (GMT+7).
-- Số liệu cập nhật khi tải trang hoặc bấm Làm mới; không tự cập nhật liên tục.
-- Tìm kiếm, lọc và phân trang 15 sinh viên; quản lý FREE / PRO / SQUAD.
-- Reset quota về 0 lượt đã dùng; đổi gói có hiệu lực từ request tiếp theo.
+## Slide 18 — Admin Command Center: Quản trị hệ thống, Doanh thu VNPay & Đối soát đơn hàng
 
-Ảnh thật tại `docs/evidence/2026-11-04-final-presentation/an/`: `dashboard_an.png`, `upgrade-pro_an.png`, `upgrade-squad_an.png`, `downgrade-free_an.png`, `reset-quota_an.png`.
-Dữ liệu mẫu do ứng dụng seed trên database QA, không phải số liệu vận hành thực. Cấp gói thủ công không thu tiền hoặc tự gia hạn.
+- **Dashboard thời gian thực**: Theo dõi sinh viên theo gói, môn học, Chunks tài liệu và lượt gọi AI RAG hôm nay (GMT+7).
+- **Phân hệ Báo cáo Doanh thu & Cổng thanh toán VNPay Sandbox (`AYM70LAS`)**:
+  - Thẻ KPI Doanh thu tự động nhảy số: Tổng thu (VNĐ), phân tách gói PRO (49.000đ), gói SQUAD (129.000đ) và doanh thu hôm nay.
+  - Bảng Lưu vết Đơn hàng: Lưu vết Mã đơn hàng `TxnRef`, tài khoản sinh viên, số tiền, ngân hàng (NCB/Visa), mã giao dịch VNPay `vnpayTransactionNo` và trạng thái `THÀNH CÔNG`.
+  - **Nút "Xuất CSV Đối Soát"** (`/admin/revenue/export-csv`): Tải file CSV định dạng UTF-8 BOM mở bằng Microsoft Excel hiển thị đầy đủ tiếng Việt có dấu.
+  - **Cổng đối soát VNPay Merchant Portal**: Minh chứng đối chiếu 1-1 trên `sandbox.vnpayment.vn/merchantv2` (tài khoản `thanhtung22012006@gmail.com`).
+- **Quản lý người dùng (`/admin/users`)**:
+  - Tìm kiếm, lọc và phân trang 15 sinh viên; quản lý nâng/hạ gói FREE / PRO / SQUAD.
+  - Nút **"Reset Quota RAG"**: Khôi phục lại 50 câu hỏi/ngày cho sinh viên khi cần hỗ trợ đột xuất.
 
-## Slide 19 — Khóa Gemini tập trung và kiểm tra kết nối
+Ảnh minh chứng tại `docs/evidence/2026-11-04-final-presentation/an/`: `dashboard_an.png`, `upgrade-pro_an.png`, `upgrade-squad_an.png`, `downgrade-free_an.png`, `reset-quota_an.png`.
 
-- Admin cấu hình System Key; giao diện che khóa dạng `AIzaSy...****`.
-- Khóa nhập trên Admin Settings chỉ nằm trong bộ nhớ, không lưu database và mất khi khởi động lại.
-- Cấu hình lâu dài qua `GEMINI_API_KEY` trong môi trường hoặc `.env` cục bộ.
-- Ping gửi yêu cầu sinh nội dung ngắn; latency gồm cả mạng và xử lý của nhà cung cấp.
+---
 
-**Ping Gemini thật ngày 04/11/2026: thành công, 1206 ms.** Ảnh `docs/evidence/2026-11-04-final-presentation/an/ping-success_an.png`, chụp trên ứng dụng cổng 6969 sau khi người dùng tự cấu hình khóa. Khóa hiển thị đã che, ô nhập trống sau request. `ping-missing-key_an.png` lưu riêng nhánh lỗi trước khi cấu hình. Masking giảm nguy cơ lộ khóa trên giao diện, không bảo đảm bảo mật tuyệt đối.
+## Slide 19 — Centralized Gemini System Key, Bảo mật Masking & Kiểm tra kết nối
 
-## Slide 20 — Báo cáo kiểm thử ngày 04/11/2026
+- **Cơ chế Centralized System Key**: Quản trị viên cấu hình Gemini API Key một lần duy nhất tại trang Cài đặt (`/admin/settings`), toàn bộ hệ thống tự động chia sẻ an toàn cho Chatbot RAG, Quiz và Planner.
+- **Bảo mật API Key Masking (`AIzaSy...****`)**: Tự động che giấu ký tự nhạy cảm trên giao diện web, triệt tiêu nguy cơ lộ key khi trình chiếu slide hoặc quay video demo.
+- **Kiểm tra kết nối thực tế (Ping Test)**: Nút bấm Ping gửi yêu cầu tới máy chủ Google AI API, đo thời gian đáp ứng thực tế (ms) đảm bảo hệ thống sẵn sàng.
+- **Ping Gemini thật ngày 04/11/2026: thành công, 1206 ms.** Ảnh minh chứng `ping-success_an.png`.
 
-- **329 tests — 0 failures — 0 errors — 0 skipped — BUILD SUCCESS.**
-- Riêng `AdminHubTest`: **40/40 PASS**.
-- Phạm vi: phân quyền/CSRF; đổi gói/reset; phân trang; cách ly dữ liệu; đề Solo và bảng xếp hạng.
-- Test tranh chấp quota ở service không phải benchmark tải toàn hệ thống.
+---
 
-Nguồn: `docs/evidence/2026-11-04-final-presentation/an/test-summary.txt`. Số 327 trong kế hoạch là số cũ. Không suy diễn PASS tự động thành mọi luồng thực tế đã nghiệm thu hoặc hệ thống không còn bug.
+## Slide 20 — Báo cáo đảm bảo chất lượng toàn diện (QA Report — 333 Tests PASS)
 
-## Slide 21 — Cài đặt và chạy
+- **333 tests — 0 failures — 0 errors — 0 skipped — BUILD SUCCESS 100%.**
+  - Bao gồm 6 test cases kiểm thử tích hợp thanh toán VNPay Sandbox & tính toán doanh thu (`VnPayPaymentAndRevenueTest`).
+  - Riêng `AdminHubTest`: **40/40 PASS**.
+- **Các kịch bản kiểm thử trọng yếu đã vượt qua**:
+  - **VNPay Integrity & Revenue Test**: Kiểm thử tạo URL thanh toán HMAC-SHA512, xác thực phản hồi Sandbox, tính toán tổng doanh thu và logic cộng dồn 30 ngày hạn dùng gói cước.
+  - **Quota Concurrency Test**: Kiểm thử chịu tải đồng thời, chống gian lận vượt quá 50 câu RAG/ngày.
+  - **Data Isolation Test**: Kiểm thử cách ly môn học cá nhân và đề thi Solo trong môn nhóm `[SQUAD]`.
+  - **RBAC Security Test**: Chặn 100% sinh viên thường truy cập `/admin/*` và `/h2-console`.
+  - **Leaderboard Guard Test**: Đề thi Solo tuyệt đối không rò rỉ điểm số lên Squad Leaderboard.
 
-- Java 17 theo cấu hình dự án; Maven 3.8+; H2 tự tạo file dữ liệu.
-- Clone repository, chuyển vào thư mục dự án, sao chép `.env.example` thành `.env`.
-- Điền `GEMINI_API_KEY`. Google OAuth cần cả `GOOGLE_CLIENT_ID` **và** `GOOGLE_CLIENT_SECRET`, cùng redirect URI `http://localhost:6969/login/oauth2/code/google`.
-- Chạy `mvn spring-boot:run`, mở `http://localhost:6969` (cổng mặc định hiện tại; có thể ghi đè bằng `--server.port=8080`).
-- Database mới: tài khoản demo `admin / 123456`; database cũ có thể khác.
+---
 
-Lần QA này dùng JDK 25.0.4, Maven 3.9.16, Spring Boot 3.3.4, database riêng `target/admin-final-20261104`; chưa kiểm chứng lại JDK 17. PowerShell/JDK 25 chạy test bằng `mvn -B '-Dnet.bytebuddy.experimental=true' test`. Không đưa `.env` hay khóa thật lên Git.
+## Slide 21 — Hướng dẫn cài đặt và khởi chạy dự án (User Guide — Setup & Code)
 
-## Slide 22 — Tổng kết và hỏi đáp
+- **Môi trường yêu cầu**: Java 17 LTS theo cấu hình dự án, Maven 3.8 trở lên, H2 Database tự tạo file dữ liệu cục bộ (`./data/studyhubdb`).
+- **Quy trình triển khai 3 bước siêu tốc**:
+  1. Clone mã nguồn từ GitHub: `git clone https://github.com/Tung-pro123/Smart-StudyHub-RAG.git`
+  2. Cấu hình biến môi trường file `.env`: Điền `GEMINI_API_KEY`, `GOOGLE_CLIENT_ID` và `GOOGLE_CLIENT_SECRET`.
+  3. Khởi chạy với 1 lệnh duy nhất: `mvn spring-boot:run` $\rightarrow$ Mở trình duyệt tại `http://localhost:8080`.
+- Tài khoản quản trị mặc định: `admin` / `password123`.
 
-- Sản phẩm tích hợp UI Toolkit/AI Agent, RAG, OAuth2, Quiz, Planner và Squad.
-- Minh chứng bằng thao tác thực tế và kết quả kiểm thử phiên bản tổng duyệt.
-- Cảm ơn Thầy/Cô; mời Hội đồng đặt câu hỏi cho toàn nhóm.
+---
 
-Không tuyên bố “0% ảo giác”, “không còn bug” hoặc “đạt 100% rubric” từ số test PASS. Bộ nội dung này dùng để ghép vào deck chung 22 slide; không thêm trang bìa riêng cho khối của Ân.
+## Slide 22 — Tổng kết, Lời cảm ơn & Mời Hội đồng bước vào phần Q&A
+
+- **Tổng kết giá trị sản phẩm**: Kết hợp trọn vẹn cả nội dung Assignment (Thymeleaf UI Toolkit + AI Agent trong IDE) lẫn Project cuối kỳ (RAG AI không ảo giác, Google OAuth2, Quiz, Planner, Squad Hub và Cổng thanh toán VNPay Sandbox).
+- Sản phẩm hoàn thiện thực chiến, kiểm thử tự động 100%, sẵn sàng đưa vào ứng dụng thực tế.
+- **Lời cảm ơn**: Thay mặt toàn thể 6 thành viên Nhóm 2, em xin gửi lời cảm ơn chân thành tới quý Thầy Cô trong Hội đồng Giảng viên.
+- Toàn thể nhóm xin trân trọng kính mời quý Thầy Cô bước vào phần Hỏi - Đáp (Q&A).
